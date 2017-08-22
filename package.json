@@ -49,7 +49,10 @@
     "watch:dll": "webOptimizer build:dll --watch"
   },
   "dependencies": {
-    "clientnode": "^1.0.225"
+    "clientnode": "^1.0.225",
+    "ejs": "^2.5.7",
+    "jsoneditor": "^5.9.4",
+    "tinymce": "^4.6.5"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
