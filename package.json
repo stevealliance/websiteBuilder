@@ -1,0 +1,114 @@
+{
+  "name": "website-builder",
+  "version": "1.0.0",
+  "license": "CC-BY-3.0",
+  "description": "edit data for a templates",
+  "homepage": "http://torben.website/websiteBuilder",
+  "documentationWebsite": {
+    "languages": [
+      "deDE",
+      "enUS"
+    ],
+    "name": "websiteBuilder",
+    "tagline": "agile template maintenance<!--deDE:agile Template Pflege-->",
+    "trackingCode": "UA-40192634-27"
+  },
+  "keywords": [
+    "template",
+    "website",
+    "builder",
+    "editor",
+    "data",
+    "representation"
+  ],
+  "files": [
+    "index.js",
+    "index.css",
+    "index.compiled.css"
+  ],
+  "main": "index.compiled.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thaibault/websiteBuilder"
+  },
+  "scripts": {
+    "build": "webOptimizer build",
+    "build:dll": "webOptimizer build:dll",
+    "clear": "webOptimizer clear",
+    "document": "webOptimizer document",
+    "export": "webOptimizer build '{development:{tool:false},module:{preprocessor:{javaScript:{options:{plugins:{__remove__:\"transform-runtime\"}}}}}}'",
+    "lint": "webOptimizer check:type; webOptimizer lint",
+    "prepare": "npm run build",
+    "serve": "webOptimizer serve",
+    "start": "npm run serve",
+    "test": "webOptimizer test",
+    "test:browser": "webOptimizer test:browser",
+    "update": "npm version patch && npm publish",
+    "update:documentation": "documentationWebsite --log-level info",
+    "watch": "webOptimizer build --watch",
+    "watch:dll": "webOptimizer build:dll --watch"
+  },
+  "dependencies": {
+    "clientnode": "^1.0.225"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "babel-plugin-transform-proto-to-assign": "^6.23.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "documentation-website": "^1.0.61",
+    "eslint": "^4.2.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-plugin-flowtype": "^2.35.0",
+    "eslint-plugin-jsdoc": "^3.1.1",
+    "flow-bin": "^0.50.0",
+    "jsdoc": "^3.5.2",
+    "source-map-support": "^0.4.15",
+    "stylelint": "^7.13.0",
+    "weboptimizer": "^1.0.347",
+    "webpack": "^3.2.0",
+    "webpack-dev-server": "^2.5.1"
+  },
+  "webOptimizer": {
+    "injection": {
+      "external": {
+        "implicit": {
+          "pattern": {
+            "exclude": {
+              "__append__": {
+                "__evaluate__": "/^clientnode\\/test(?:\\.compiled)?(?:\\.js)?$/"
+              }
+            }
+          }
+        }
+      },
+      "internal": {
+        "vendor": {
+          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['build:dll', 'serve', 'test:browser', 'watch:dll'].includes(self.givenCommandLineArguments[2]) ? ['babel-polyfill', 'clientnode'].concat(self.givenCommandLineArguments[2] === 'serve' ? [] : ['script!qunitjs', 'weboptimizer/browserAPI']) : []"
+        }
+      }
+    },
+    "module": {
+      "optimizer": {
+        "babili": null
+      },
+      "preprocessor": {
+        "javaScript": {
+          "options": {
+            "presets": {
+              "__evaluate__": "(self.targetTechnology === 'node' ? ['es2017-node7'] : [['modern-browsers', {loose: true}], 'es2017']).concat('stage-0')"
+            }
+          }
+        }
+      },
+      "replacements": {
+        "normal": {
+          "^clientnode/test$": "clientnode/test.compiled.js"
+        }
+      },
+      "skipParseRegularExpressions": {
+        "__evaluate__": "/(?:^|\\/)(?:(?:babel-polyfill\\/dist\\/polyfill)|(?:webpack\\/buildin\\/global)|(?:webpack\\/buildin\\/module))(?:\\.min)?\\.js(?:\\?.+|$)/"
+      }
+    }
+  }
+}

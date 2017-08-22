@@ -1,0 +1,56 @@
+<!doctype html>
+<%_ /*
+    region header
+    Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
+
+    License
+    -------
+
+    This library written by Torben Sickert stand under a creative commons naming
+    3.0 unported license. see http://creativecommons.org/licenses/by/3.0/deed.de
+    endregion
+*/ _%>
+<html class="no-javascript" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <!--Prevent browser caching-->
+        <meta http-equiv="cache-control" content="no-cache">
+        <meta http-equiv="expires" content="0">
+        <meta http-equiv="pragma" content="no-cache">
+        <title>playground</title>
+        <script scope>
+            const schema = {
+                title: 'options',
+                properties: {
+                    number: {
+                        type: 'integer'
+                    }
+                }
+            }
+            const scope = {
+                parameter: {
+                    number: 1
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <%_ for (let index = 0; index < number; index += 1) { _%>
+            <div bind-simple="simple">simple</div>
+            <div bind-simple-content="simpleContent">simpleContent</div>
+            <hr />
+            <div bind="normal">normal</div>
+            <div bind-content="normalContent">normalContent</div>
+            <hr />
+            <div bind-advanced="advanced">advanced</div>
+            <div bind-advanced-content="advancedContent">advancedContent</div>
+            <div bind-advanced-content="advancedContentPlaceholder">Start - ${parameter.number} - advancedContent</div>
+        <%_ } _%>
+    </body>
+<html>
+<%_ /*
+    region vim modline
+    vim: set tabstop=4 shiftwidth=4 expandtab:
+    vim: foldmethod=marker foldmarker=region,endregion:
+    endregion
+*/ _%>
