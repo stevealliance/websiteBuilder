@@ -31,7 +31,16 @@ import tinymce from 'tinymce'
 export const $:any = binding
 // region plugins/classes
 /**
- * TODO
+ * @property static:escapedMarkupSymbolMapping - Symbol sequence mapping to
+ * convert escaped markup.
+ *
+ * @property currentMode - Current editing mode.
+ * @property domNodes - Reference to all needed control dom nodes.
+ * @property domNode - Determined entry dom node.
+ * @property inPlaceEditorInstances - Mapping from scope name to its mapped
+ * list of dom nodes and in place editor instances.
+ * @property jsonEditor - JSON editor instance.
+ * @property template - Determined template to render parameter into.
  */
 export default class WebsiteBuilder extends $.Tools.class {
     // region properties
@@ -46,19 +55,18 @@ export default class WebsiteBuilder extends $.Tools.class {
 
     currentMode:string = 'hybrid'
     domNodes:{[key:string]:DomNode}
-    entryDomNode:DomNode
-    inPlaceEditorInstances:{[key:string]:Array<Object>}
+    domNode:DomNode
+    inPlaceEditorInstances:{[key:string]:Array<Array<Object>>}
     jsonEditor:JSONEditor
-    scope:PlainObject
     template:string = ''
     // endregion
     // region public methods
     /**
-     * TODO
+     * @param options - Options for customizing editing behavior.
+     * @returns Determined entry dom node.
      */
     initialize(options:Object = {}):DomNode {
         this._options = {
-            content: {},
             inPlaceEditor: {
                 inline: true,
                 menubar: false,
@@ -76,45 +84,79 @@ export default class WebsiteBuilder extends $.Tools.class {
                 disable_edit_json: true,
                 disable_properties: true,
                 format: 'grid'
-            }
+            },
+            neededDomNodeSpecifications: {
+                buttons: [
+                    {
+                        action: (state) => {
+                            this.domNodes.jsonEditor.style.display =
+                                state === 'active' ? 'block' : 'none'
+                        },
+                        label: {
+                            active: 'Hide options',
+                            inactive: 'Show options'
+                        },
+                        name: 'options',
+                        states: ['inactive', 'active']
+                    },
+                    {
+                        action: this.updateMode.bind(this),
+                        label: {
+                            hybrid: 'Show preview',
+                            preview: 'Mark editables',
+                            helper: 'Unmark editables'
+                        },
+                        name: 'preview',
+                        states: ['hybrid', 'preview', 'helper']
+                    }
+                ],
+                divs: [
+                    {
+                        name: 'jsonEditor',
+                        style: {
+                            backgroundColor: 'white',
+                            display: 'none',
+                            position: 'absolute',
+                            letf: 0,
+                            top: 0,
+                            width: '100%',
+                            zIndex: 9 ** 9
+                        }
+                    },
+                    {
+                        name: 'toolbar',
+                        style: {
+                            backgroundColor: 'white',
+                            position: 'absolute',
+                            right: 0,
+                            top: 0,
+                            zIndex: 9 ** 9 + 1
+                        }
+                    }
+                ]
+            },
+            retrieveContent: {},
+            schema: $.global.schema || {},
+            scope: $.global.scope || {},
+            selectedEditorIndicatorClassName: 'selected'
         }
         super.initialize(options)
         this.extendObject(
             true, JSONEditor.defaults.options, this._options.jsonEditor)
         $.global.document.addEventListener('DOMContentLoaded', ():void => {
-            this.entryDomNode = $.global.document.querySelector('[root]')
-            if (!this.entryDomNode) {
-                this.entryDomNode = $.global.document.createElement('div')
-                this.entryDomNode.innerHTML = $.global.document.body.innerHTML
+            this.domNode = $.global.document.querySelector('[root]')
+            if (!this.domNode) {
+                this.domNode = $.global.document.createElement('div')
+                this.domNode.innerHTML = $.global.document.body.innerHTML
                 $.global.document.body.innerHTML = ''
-                $.global.document.body.appendChild(this.entryDomNode)
+                $.global.document.body.appendChild(this.domNode)
             }
-            this.template = this.entryDomNode.innerHTML
+            this.template = this.domNode.innerHTML
             this.updateMode()
-            for (const div:PlainObject of [
-                {
-                    name: 'jsonEditor',
-                    style: {
-                        backgroundColor: 'white',
-                        display: 'none',
-                        position: 'absolute',
-                        letf: 0,
-                        top: 0,
-                        width: '100%',
-                        zIndex: 9 ** 9
-                    }
-                },
-                {
-                    name: 'toolbar',
-                    style: {
-                        backgroundColor: 'white',
-                        position: 'absolute',
-                        right: 0,
-                        top: 0,
-                        zIndex: 9 ** 9 + 1
-                    }
-                }
-            ]) {
+            for (
+                const div:PlainObject of
+                this._options.neededDomNodeSpecification.divs
+            ) {
                 const domNode:DomNode = $.global.document.createElement('div')
                 for (const key:string in div.style)
                     if (div.style.hasOwnProperty(key))
@@ -122,30 +164,10 @@ export default class WebsiteBuilder extends $.Tools.class {
                 this.domNodes[div.name] = domNode
                 $.global.document.body.appendChild(domNode)
             }
-            for (const button:PlainObject of [
-                {
-                    action: (state) => {
-                        domNodes.jsonEditor.style.display =
-                            state === 'active' ? 'block' : 'none'
-                    },
-                    label: {
-                        active: 'Hide options',
-                        inactive: 'Show options'
-                    },
-                    name: 'options',
-                    states: ['inactive', 'active']
-                },
-                {
-                    action: updateMode,
-                    label: {
-                        hybrid: 'Show preview',
-                        preview: 'Mark editables',
-                        helper: 'Unmark editables'
-                    },
-                    name: 'preview',
-                    states: ['hybrid', 'preview', 'helper']
-                }
-            ]) {
+            for (
+                const button:PlainObject of
+                this._options.neededDomNodeSpecification.buttons
+            ) {
                 button.state = button.states[0]
                 const domNode:DomNode = $.global.document.createElement(
                     'button')
@@ -162,43 +184,53 @@ export default class WebsiteBuilder extends $.Tools.class {
                 this.domNodes.toolbar.appendChild(domNode)
             }
             this.jsonEditor = new JSONEditor(
-                this.domNodes.jsonEditor, {schema})
-            this.jsonEditor.setValue(scope.parameter)
+                this.domNodes.jsonEditor, {schema: this._options.schema})
+            this.jsonEditor.setValue(this._options.scope.parameter)
             this.jsonEditor.on('change', () => {
                 const errors = this.jsonEditor.validate()
                 if (errors.length)
                     $.global.alert(errors[0])
                 else {
                     this.extendObject(
-                        true, scope.parameter, this.jsonEditor.getValue())
+                        true, this._options.scope.parameter,
+                        this.jsonEditor.getValue())
                     // TODO send data to parent context via post message.
                     this.updateMode()
                 }
             })
         })
-        return this.entryDomNode
+        return this.domNode
     }
     /**
-     * TODO
+     * Converts given escaped markup string into its plain representation.
+     * @param text - Input to convert.
+     * @returns Converted input.
      */
     static unescapeHTML(text:string):string {
         return text.replace(new RegExp(Object.keys(
             WebsiteBuilder.escapedMarkupSymbolMapping
-        ).join('|'), 'g'), (symbols:string):string => mapping[symbols])
+        ).join('|'), 'g'), (symbols:string):string =>
+            WebsiteBuilder.escapedMarkupSymbolMapping[symbols])
     }
     /**
-     * TODO
+     * Transforms content before exporting from an in place editor.
+     * @param content - String to transform.
+     * @returns Transformed given content.
      */
     transformContent(content:string):string {
         return content
     }
     /**
-     * TODO
+     * Synchronizes in place editor content with each other.
+     * @param name - Scope bounded name to synchronize from given editor
+     * instance.
+     * @param givenInstance - In pace editor instance to use as data source.
+     * @returns Nothing.
      */
     updateModel(name:string, givenInstance:Object):void {
         const content:string = this.transformContent(
-            givenInstance.getContent(this._options.content))
-        this.scope[name] = content
+            givenInstance.getContent(this._options.retrieveContent))
+        this._options.scope[name] = content
         for (const instance:Array<Object> of this.inPlaceEditorInstances[name])
             /*
                 NOTE: An instance tuple consists of a dom node and optionally
@@ -212,14 +244,17 @@ export default class WebsiteBuilder extends $.Tools.class {
                 instance[0].innerHTML = content
     }
     /**
-     * TODO
+     * Renders currently defined template parameter into the entry dom node.
+     * @returns Nothing.
      */
     renderParameter():void {
-        return this.entryDomNode.innerHTML = ejs.render(
-            WebsiteBuilder.unescapeHTML(this.template), this.scope.parameter)
+        return this.domNode.innerHTML = ejs.render(
+            WebsiteBuilder.unescapeHTML(this.template),
+            this._options.scope.parameter)
     }
     /**
-     * TODO
+     * Renders current scope values into the entry dom nodes content.
+     * @returns Nothing.
      */
     render():void {
         for (const type:string of ['', '-simple', '-advanced'])
@@ -227,21 +262,24 @@ export default class WebsiteBuilder extends $.Tools.class {
                 const attributeName:string = `bind${type}${defaultType}`
                 for (
                     const domNode:DomNode of
-                    $.global.document.querySelectorAll(`[${attributeName}]`)
+                    this.domNode.querySelectorAll(`[${attributeName}]`)
                 ) {
                     const name:string = domNode.getAttribute(attributeName)
                     if (!name)
                         continue
-                    domNode.innerHTML = scope.hasOwnProperty(
+                    domNode.innerHTML = this._options.scope.hasOwnProperty(
                         name
                     ) ? new Function(
-                        ...Object.keys(scope), `return \`${scope[name]}\``
-                    )(...Object.values(scope)) : ''
+                        // IgnoreTypeCheck
+                        ...Object.keys(this._options.scope),
+                        `return \`${this._options.scope[name]}\``
+                    )(...Object.values(this._options.scope)) : ''
                 }
             }
     }
     /**
-     * TODO
+     * Initializes all in place editors.
+     * @returns Nothing.
      */
     initializeInPlaceEditor():void {
         this.inPlaceEditorInstances = {}
@@ -250,7 +288,7 @@ export default class WebsiteBuilder extends $.Tools.class {
                 const attributeName:string = `bind${type}${defaultType}`
                 for (
                     const domNode:DomNode of
-                    $.global.document.querySelectorAll(`[${attributeName}]`)
+                    this.domNode.querySelectorAll(`[${attributeName}]`)
                 ) {
                     const name:string = domNode.getAttribute(attributeName)
                     if (!name)
@@ -260,15 +298,15 @@ export default class WebsiteBuilder extends $.Tools.class {
                         this.inPlaceEditorInstances[name].push(tuple)
                     else
                         this.inPlaceEditorInstances[name] = [tuple]
-                    if (scope.hasOwnProperty(name))
-                        domNode.innerHTML = scope[name]
+                    if (this._options.scope.hasOwnProperty(name))
+                        domNode.innerHTML = this._options.scope[name]
                     else if (defaultType === '')
                         domNode.innerHTML = ''
                     else
-                        scope[name] = this.transformContent(domNode.innerHTML)
+                        this._options.scope[name] = this.transformContent(domNode.innerHTML)
                     domNode.addEventListener('click', ():void =>
                         tinymce.init(this.extendObject(
-                            {}, editorOptions, {
+                            {}, this._options.inPlaceEditor, {
                                 setup: (instance:Object):void => {
                                     tuple.push(instance)
                                     instance.on('init', ():void => {
@@ -302,34 +340,36 @@ export default class WebsiteBuilder extends $.Tools.class {
                                     })
                                     instance.on('focus', ():void => {
                                         const lastSelectedDomNode:DomNode =
-                                            $.global.document.querySelector(
-                                                '.editor-selected')
+                                            this.domNode.querySelector(
+                                                `.${this._options.selectedEditorIndicatorClassName}`)
                                         if (lastSelectedDomNode)
                                             lastSelectedDomNode.classList
-                                                .remove('editor-selected')
-                                        domNode.classList.add('editor-selected')
-                                    })
-                                    // Update model on button click
-                                    instance.on('ExecCommand', ():void =>
-                                        this.updateModel(name, instance))
-                                    // Update model on change
-                                    instance.on('change', ():void => {
-                                        instance.save()
-                                        this.updateModel(name, instance)
+                                                .remove(this._options.selectedEditorIndicatorClassName)
+                                        domNode.classList.add(this._options.selectedEditorIndicatorClassName)
                                     })
                                     instance.on('blur', domNode.blur.bind(
                                         domNode))
-                                    // Update model when an object has been resized (table, image)
-                                    instance.on('ObjectResized', ():void => {
-                                        instance.save()
-                                        this.updateModel(name, instance)
-                                    })
+                                    // Update model on changes
+                                    instance.on('ExecCommand', ():void =>
+                                        this.updateModel(name, instance))
+                                    for (const eventName:string of [
+                                        'change', 'ObjectResized'
+                                    ])
+                                        instance.on(eventName, ():void => {
+                                            instance.save()
+                                            this.updateModel(name, instance)
+                                        })
                                 },
                                 target: domNode
                             })))
                 }
             }
     }
+    /**
+     * Updates current editor mode into given one or currently set.
+     * @param mode - New mode to switch to-
+     * @returns Nothing.
+     */
     updateMode(mode:?string):void {
         if (mode)
             this.currentMode = mode
@@ -343,7 +383,7 @@ export default class WebsiteBuilder extends $.Tools.class {
 }
 // endregion
 $.fn.WebsiteBuilder = function(...parameter:Array<any>):any {
-    return $.Tools().controller(Incrementer, parameter, this)
+    return $.Tools().controller(WebsiteBuilder, parameter, this)
 }
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
