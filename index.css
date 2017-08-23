@@ -10,15 +10,14 @@ This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. see http://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
 :root {
-    [bind], [bind-content],
-    [bind-simple], [bind-simple-content],
-    [bind-advanced], [bind-advanced-content] {
+    [bind],
+    [bind-content],
+    [bind-simple],
+    [bind-simple-content],
+    [bind-advanced],
+    [bind-advanced-content] {
         border: 1px dotted grey;
         min-height: 10px;
-    }
-    body {
-        margin: 0;
-        padding: 0;
     }
 }
 /* region vim modline

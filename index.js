@@ -78,17 +78,19 @@ export default class WebsiteBuilder extends $.Tools.class {
                 toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
             },
             jsonEditor: {
+                /* eslint-disable camelcase */
                 disable_array_delete_all_rows: true,
                 disable_array_delete_last_row: true,
                 disable_collapse: true,
                 disable_edit_json: true,
                 disable_properties: true,
                 format: 'grid'
+                /* eslint-enable camelcase */
             },
             neededDomNodeSpecifications: {
                 buttons: [
                     {
-                        action: (state) => {
+                        action: (state:string):void => {
                             this.domNodes.jsonEditor.style.display =
                                 state === 'active' ? 'block' : 'none'
                         },
@@ -186,7 +188,7 @@ export default class WebsiteBuilder extends $.Tools.class {
             this.jsonEditor = new JSONEditor(
                 this.domNodes.jsonEditor, {schema: this._options.schema})
             this.jsonEditor.setValue(this._options.scope.parameter)
-            this.jsonEditor.on('change', () => {
+            this.jsonEditor.on('change', ():void => {
                 const errors = this.jsonEditor.validate()
                 if (errors.length)
                     $.global.alert(errors[0])
@@ -200,6 +202,41 @@ export default class WebsiteBuilder extends $.Tools.class {
             })
         })
         return this.domNode
+    }
+    /**
+     * Tinymce uses color of target node for inline editing. For font color
+     * this doesn't make any sense if corresponding background color will be
+     * omitted and text color is the sames as background color so resetting it
+     * here to the same color as the first found button.
+     * @returns Nothing.
+     */
+    _inPlaceEditorBackfoundColorFix():void {
+        for (const name:string of ['click', 'mouseover'])
+            $.global.document.body.addEventListener(name, (
+                event:Object
+            ):void => {
+                if (event.target && (
+                    event.target.classList.contains('mce-tinymce-inline') ||
+                    event.target.classList.contains('mce-container')
+                )) {
+                    const inlineEditorDomNode:?DomNode =
+                        this.domNode.querySelector('.mce-tinymce-inline')
+                    const buttonDomNodes:Array<DomNode> =
+                        inlineEditorDomNode ?
+                            inlineEditorDomNode.querySelectorAll('button') :
+                            []
+                    const editorDomNode:?DomNode = this.domNode.querySelector(
+                        '.mce-container')
+                    const inlineButtonDomNodes:Array<DomNode> =
+                        editorDomNode ?
+                            editorDomNode.querySelectorAll(
+                                'span[style]:not([contenteditable])') :
+                            []
+                    if (buttonDomNodes.length && inlineButtonDomNodes.length)
+                        for (const domNode:DomNode of inlineButtonDomNodes)
+                            domNode.style.color = buttonDomNodes[0].style.color
+                }
+            })
     }
     /**
      * Converts given escaped markup string into its plain representation.
@@ -267,13 +304,13 @@ export default class WebsiteBuilder extends $.Tools.class {
                     const name:string = domNode.getAttribute(attributeName)
                     if (!name)
                         continue
-                    domNode.innerHTML = this._options.scope.hasOwnProperty(
-                        name
-                    ) ? new Function(
-                        // IgnoreTypeCheck
-                        ...Object.keys(this._options.scope),
-                        `return \`${this._options.scope[name]}\``
-                    )(...Object.values(this._options.scope)) : ''
+                    domNode.innerHTML = ''
+                    if (this._options.scope.hasOwnProperty(name))
+                        domNode.innerHTML = new Function(
+                            // IgnoreTypeCheck
+                            ...Object.keys(this._options.scope),
+                            `return \`${this._options.scope[name]}\``
+                        )(...Object.values(this._options.scope))
                 }
             }
     }
@@ -303,7 +340,8 @@ export default class WebsiteBuilder extends $.Tools.class {
                     else if (defaultType === '')
                         domNode.innerHTML = ''
                     else
-                        this._options.scope[name] = this.transformContent(domNode.innerHTML)
+                        this._options.scope[name] = this.transformContent(
+                            domNode.innerHTML)
                     domNode.addEventListener('click', ():void =>
                         tinymce.init(this.extendObject(
                             {}, this._options.inPlaceEditor, {
@@ -311,41 +349,18 @@ export default class WebsiteBuilder extends $.Tools.class {
                                     tuple.push(instance)
                                     instance.on('init', ():void => {
                                         instance.focus()
-                                        /*
-                                            NOTE: Tinymce uses color of target
-                                            node for inline editing. For font
-                                            color this doesn't make any sense
-                                            if corresponding background color
-                                            will be omitted and text color is
-                                            the sames as background color so
-                                            resetting it here to the same color
-                                            as the first found button.
-                                        */
-                                        /* TODO
-                                        $.global.document.body.on(
-                                            'click mouseover'
-                                            '.mce-tinymce-inline, .mce-container', ->
-                                                buttons = $window.angular.element(
-                                                    '.mce-tinymce-inline'
-                                                ).find 'button'
-                                                inlineButtons = $window.angular.element(
-                                                    '.mce-container'
-                                                ).find 'span[style]:not([contenteditable])'
-                                                if buttons.length and inlineButtons.length
-                                                    $window.angular.element('.mce-container').find(
-                                                        'span[style]:not([contenteditable])'
-                                                    ).css 'color', buttons.css 'color'
-                                        )
-                                        */
+                                        this._inPlaceEditorBackfoundColorFix()
                                     })
                                     instance.on('focus', ():void => {
+                                        const className:string = this._options
+                                            .selectedEditorIndicatorClassName
                                         const lastSelectedDomNode:DomNode =
                                             this.domNode.querySelector(
-                                                `.${this._options.selectedEditorIndicatorClassName}`)
+                                                `.${className}`)
                                         if (lastSelectedDomNode)
                                             lastSelectedDomNode.classList
-                                                .remove(this._options.selectedEditorIndicatorClassName)
-                                        domNode.classList.add(this._options.selectedEditorIndicatorClassName)
+                                                .remove(className)
+                                        domNode.classList.add(className)
                                     })
                                     instance.on('blur', domNode.blur.bind(
                                         domNode))
@@ -367,7 +382,7 @@ export default class WebsiteBuilder extends $.Tools.class {
     }
     /**
      * Updates current editor mode into given one or currently set.
-     * @param mode - New mode to switch to-
+     * @param mode - New mode to switch to.
      * @returns Nothing.
      */
     updateMode(mode:?string):void {
