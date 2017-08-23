@@ -34,6 +34,7 @@ export const $:any = binding
  * TODO
  */
 export default class WebsiteBuilder extends $.Tools.class {
+    // region properties
     static escapedMarkupSymbolMapping:{[key:string]:string} = {
         '&amp;': '&',
         '&lt;': '<',
@@ -46,14 +47,16 @@ export default class WebsiteBuilder extends $.Tools.class {
     currentMode:string = 'hybrid'
     domNodes:{[key:string]:DomNode}
     entryDomNode:DomNode
-    inPlaceEditorInstances:{[key:string]:Array<PlainObject>}
+    inPlaceEditorInstances:{[key:string]:Array<Object>}
     jsonEditor:JSONEditor
+    scope:PlainObject
     template:string = ''
+    // endregion
     // region public methods
     /**
      * TODO
      */
-    initialize(options:Object = {}):$DomNode {
+    initialize(options:Object = {}):DomNode {
         this._options = {
             content: {},
             inPlaceEditor: {
@@ -76,13 +79,13 @@ export default class WebsiteBuilder extends $.Tools.class {
             }
         }
         super.initialize(options)
-        Tools.extendObject(
+        this.extendObject(
             true, JSONEditor.defaults.options, this._options.jsonEditor)
-        document.addEventListener('DOMContentLoaded', ():void => {
-            this.entryDomNode = document.querySelector('[root]')
+        $.global.document.addEventListener('DOMContentLoaded', ():void => {
+            this.entryDomNode = $.global.document.querySelector('[root]')
             if (!this.entryDomNode) {
-                this.entryDomNode = document.createElement('div')
-                this.entryDomNode.innerHTML = document.body.innerHTML
+                this.entryDomNode = $.global.document.createElement('div')
+                this.entryDomNode.innerHTML = $.global.document.body.innerHTML
                 $.global.document.body.innerHTML = ''
                 $.global.document.body.appendChild(this.entryDomNode)
             }
@@ -112,7 +115,7 @@ export default class WebsiteBuilder extends $.Tools.class {
                     }
                 }
             ]) {
-                const domNode:DomNode = document.createElement('div')
+                const domNode:DomNode = $.global.document.createElement('div')
                 for (const key:string in div.style)
                     if (div.style.hasOwnProperty(key))
                         domNode.style[key] = div.style[key]
@@ -144,7 +147,8 @@ export default class WebsiteBuilder extends $.Tools.class {
                 }
             ]) {
                 button.state = button.states[0]
-                const domNode:DomNode = document.createElement('button')
+                const domNode:DomNode = $.global.document.createElement(
+                    'button')
                 domNode.addEventListener('click', ():void => {
                     button.state = button.states[
                         (button.states.indexOf(button.state) + 1) %
@@ -165,7 +169,7 @@ export default class WebsiteBuilder extends $.Tools.class {
                 if (errors.length)
                     $.global.alert(errors[0])
                 else {
-                    Tools.extendObject(
+                    this.extendObject(
                         true, scope.parameter, this.jsonEditor.getValue())
                     // TODO send data to parent context via post message.
                     this.updateMode()
@@ -192,14 +196,14 @@ export default class WebsiteBuilder extends $.Tools.class {
      * TODO
      */
     updateModel(name:string, givenInstance:Object):void {
-        const content = this.transformContent(
+        const content:string = this.transformContent(
             givenInstance.getContent(this._options.content))
-        // TODO STAND
-        scope[name] = content
-        for (const instance of instances[name])
+        this.scope[name] = content
+        for (const instance:Array<Object> of this.inPlaceEditorInstances[name])
             /*
                 NOTE: An instance tuple consists of a dom node and optionally
-                a running editor instance. So update which is currently available.
+                a running editor instance as second array value. So update
+                editor instance or dom node directly as fallback.
             */
             if (instance.length === 2) {
                 if (instance[1] !== givenInstance && instance[1].getDoc())
@@ -207,67 +211,80 @@ export default class WebsiteBuilder extends $.Tools.class {
             } else
                 instance[0].innerHTML = content
     }
-    const renderParameter = () => {
-        entryDomNode.innerHTML = ejs.render(
-            unescapeHTML(template), scope.parameter)
+    /**
+     * TODO
+     */
+    renderParameter():void {
+        return this.entryDomNode.innerHTML = ejs.render(
+            WebsiteBuilder.unescapeHTML(this.template), this.scope.parameter)
     }
-    const render = () => {
-        for (const type of ['', '-simple', '-advanced'])
-            for (const defaultType of ['', '-content']) {
-                const attributeName = `bind${type}${defaultType}`
-                for (const domNode of document.querySelectorAll(
-                    `[${attributeName}]`
-                )) {
-                    const name = domNode.getAttribute(attributeName)
+    /**
+     * TODO
+     */
+    render():void {
+        for (const type:string of ['', '-simple', '-advanced'])
+            for (const defaultType:string of ['', '-content']) {
+                const attributeName:string = `bind${type}${defaultType}`
+                for (
+                    const domNode:DomNode of
+                    $.global.document.querySelectorAll(`[${attributeName}]`)
+                ) {
+                    const name:string = domNode.getAttribute(attributeName)
                     if (!name)
                         continue
                     domNode.innerHTML = scope.hasOwnProperty(
                         name
                     ) ? new Function(
-                        ...Object.keys(scope),
-                        `return \`${scope[name]}\``
+                        ...Object.keys(scope), `return \`${scope[name]}\``
                     )(...Object.values(scope)) : ''
                 }
             }
     }
+    /**
+     * TODO
+     */
     initializeInPlaceEditor():void {
-        instances = {}
-        for (const type of ['', '-simple', '-advanced'])
-            for (const defaultType of ['', '-content']) {
-                const attributeName = `bind${type}${defaultType}`
-                for (const domNode of document.querySelectorAll(
-                    `[${attributeName}]`
-                )) {
-                    const name = domNode.getAttribute(attributeName)
+        this.inPlaceEditorInstances = {}
+        for (const type:string of ['', '-simple', '-advanced'])
+            for (const defaultType:string of ['', '-content']) {
+                const attributeName:string = `bind${type}${defaultType}`
+                for (
+                    const domNode:DomNode of
+                    $.global.document.querySelectorAll(`[${attributeName}]`)
+                ) {
+                    const name:string = domNode.getAttribute(attributeName)
                     if (!name)
                         continue
-                    const tuple = [domNode]
-                    if (instances.hasOwnProperty(name))
-                        instances[name].push(tuple)
+                    const tuple:Array<Object> = [domNode]
+                    if (this.inPlaceEditorInstances.hasOwnProperty(name))
+                        this.inPlaceEditorInstances[name].push(tuple)
                     else
-                        instances[name] = [tuple]
+                        this.inPlaceEditorInstances[name] = [tuple]
                     if (scope.hasOwnProperty(name))
                         domNode.innerHTML = scope[name]
                     else if (defaultType === '')
                         domNode.innerHTML = ''
                     else
-                        scope[name] = transformContent(domNode.innerHTML)
-                    domNode.addEventListener('click', () =>
-                        tinymce.init(Tools.extendObject(
+                        scope[name] = this.transformContent(domNode.innerHTML)
+                    domNode.addEventListener('click', ():void =>
+                        tinymce.init(this.extendObject(
                             {}, editorOptions, {
-                                setup: (instance) => {
+                                setup: (instance:Object):void => {
                                     tuple.push(instance)
-                                    instance.on('init', () => {
+                                    instance.on('init', ():void => {
                                         instance.focus()
                                         /*
-                                            NOTE: Tinymce uses color of target node for inline
-                                            editing. For font color this doesn't make any sense
-                                            if corresponding background color will be omitted and text
-                                            color is the sames as background color so resetting it
-                                            here to the same color as the first found button.
+                                            NOTE: Tinymce uses color of target
+                                            node for inline editing. For font
+                                            color this doesn't make any sense
+                                            if corresponding background color
+                                            will be omitted and text color is
+                                            the sames as background color so
+                                            resetting it here to the same color
+                                            as the first found button.
                                         */
                                         /* TODO
-                                        $window.angular.element('body').on(
+                                        $.global.document.body.on(
                                             'click mouseover'
                                             '.mce-tinymce-inline, .mce-container', ->
                                                 buttons = $window.angular.element(
@@ -283,28 +300,29 @@ export default class WebsiteBuilder extends $.Tools.class {
                                         )
                                         */
                                     })
-                                    instance.on('focus', () => {
-                                        const lastSelectedDomNode = document.querySelector('.editor-selected')
+                                    instance.on('focus', ():void => {
+                                        const lastSelectedDomNode:DomNode =
+                                            $.global.document.querySelector(
+                                                '.editor-selected')
                                         if (lastSelectedDomNode)
-                                            lastSelectedDomNode.classList.remove('editor-selected')
+                                            lastSelectedDomNode.classList
+                                                .remove('editor-selected')
                                         domNode.classList.add('editor-selected')
                                     })
                                     // Update model on button click
-                                    instance.on('ExecCommand', () => {
-                                        updateModel(name, instance)
-                                    })
+                                    instance.on('ExecCommand', ():void =>
+                                        this.updateModel(name, instance))
                                     // Update model on change
-                                    instance.on('change', () => {
+                                    instance.on('change', ():void => {
                                         instance.save()
-                                        updateModel(name, instance)
+                                        this.updateModel(name, instance)
                                     })
-                                    instance.on('blur', () => {
-                                        domNode.blur()
-                                    })
+                                    instance.on('blur', domNode.blur.bind(
+                                        domNode))
                                     // Update model when an object has been resized (table, image)
-                                    instance.on('ObjectResized', () => {
+                                    instance.on('ObjectResized', ():void => {
                                         instance.save()
-                                        updateModel(name, instance)
+                                        this.updateModel(name, instance)
                                     })
                                 },
                                 target: domNode
