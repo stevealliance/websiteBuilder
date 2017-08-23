@@ -49,9 +49,9 @@
     "watch:dll": "webOptimizer build:dll --watch"
   },
   "dependencies": {
-    "clientnode": "^1.0.225",
+    "clientnode": "^1.0.233",
     "ejs": "^2.5.7",
-    "jsoneditor": "^5.9.4",
+    "json-editor": "^0.7.28",
     "tinymce": "^4.6.5"
   },
   "devDependencies": {
@@ -68,7 +68,7 @@
     "jsdoc": "^3.5.2",
     "source-map-support": "^0.4.15",
     "stylelint": "^7.13.0",
-    "weboptimizer": "^1.0.347",
+    "weboptimizer": "^1.0.360",
     "webpack": "^3.2.0",
     "webpack-dev-server": "^2.5.1"
   },
@@ -89,6 +89,12 @@
         "vendor": {
           "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['build:dll', 'serve', 'test:browser', 'watch:dll'].includes(self.givenCommandLineArguments[2]) ? ['babel-polyfill', 'clientnode'].concat(self.givenCommandLineArguments[2] === 'serve' ? [] : ['script!qunitjs', 'weboptimizer/browserAPI']) : []"
         }
+      }
+    },
+    "inPlace": {
+      "externalLibrary": {
+        "cascadingStyleSheet": true,
+        "javaScript": true
       }
     },
     "module": {

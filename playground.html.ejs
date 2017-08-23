@@ -24,8 +24,8 @@
                 padding: 0;
             }
         </style>
-        <script scope>
-            const schema = {
+        <script>
+            schema = {
                 title: 'options',
                 properties: {
                     number: {
@@ -33,7 +33,7 @@
                     }
                 }
             }
-            const scope = {
+            scope = {
                 parameter: {
                     number: 1
                 }
@@ -41,17 +41,20 @@
         </script>
     </head>
     <body>
-        <%_ for (let index = 0; index < number; index += 1) { _%>
-            <div bind-simple="simple">simple</div>
-            <div bind-simple-content="simpleContent">simpleContent</div>
-            <hr />
-            <div bind="normal">normal</div>
-            <div bind-content="normalContent">normalContent</div>
-            <hr />
-            <div bind-advanced="advanced">advanced</div>
-            <div bind-advanced-content="advancedContent">advancedContent</div>
-            <div bind-advanced-content="advancedContentPlaceholder">Start - ${parameter.number} - advancedContent</div>
-        <%_ } _%>
+        <div root>
+            <%%_ for (let index = 0; index < number; index += 1) { _%%>
+                <div bind-simple="simple">simple</div>
+                <div bind-simple-content="simpleContent">simpleContent</div>
+                <hr />
+                <div bind="normal">normal</div>
+                <div bind-content="normalContent">normalContent</div>
+                <hr />
+                <div bind-advanced="advanced">advanced</div>
+                <div bind-advanced-content="advancedContent">advancedContent</div>
+                <div bind-advanced-content="advancedContentPlaceholder">Start - ${parameter.number} - advancedContent</div>
+            <%%_ } _%%>
+        </div>
+        <script>websiteBuilder.index.$.WebsiteBuilder()</script>
     </body>
 <html>
 <%_ /*

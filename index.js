@@ -21,12 +21,36 @@
 import {$ as binding} from 'clientnode'
 import type {DomNode, PlainObject} from 'clientnode'
 import ejs from 'ejs'
-import JSONEditor from 'jsoneditor'
+import JSONEditor from 'exports?JSONEditor!json-editor'
 // NOTE: Only needed for debugging this file.
 try {
     module.require('source-map-support/register')
 } catch (error) {}
 import tinymce from 'tinymce'
+import 'tinymce/themes/modern/theme'
+import 'tinymce/plugins/advlist'
+import 'tinymce/plugins/autolink'
+import 'tinymce/plugins/lists'
+import 'tinymce/plugins/link'
+import 'tinymce/plugins/image'
+import 'tinymce/plugins/charmap'
+import 'tinymce/plugins/print'
+import 'tinymce/plugins/preview'
+import 'tinymce/plugins/anchor'
+import 'tinymce/plugins/searchreplace'
+import 'tinymce/plugins/visualblocks'
+import 'tinymce/plugins/code'
+import 'tinymce/plugins/fullscreen'
+import 'tinymce/plugins/insertdatetime'
+import 'tinymce/plugins/media'
+import 'tinymce/plugins/table'
+import 'tinymce/plugins/contextmenu'
+import 'tinymce/plugins/paste'
+require.context(
+  'file?name=[path][name].[ext]&context=node_modules/tinymce!tinymce/skins',
+  true,
+  /.*/
+)
 // endregion
 export const $:any = binding
 // region plugins/classes
@@ -54,7 +78,7 @@ export default class WebsiteBuilder extends $.Tools.class {
     static _name:string = 'WebsiteBuilder'
 
     currentMode:string = 'hybrid'
-    domNodes:{[key:string]:DomNode}
+    domNodes:{[key:string]:DomNode} = {}
     domNode:DomNode
     inPlaceEditorInstances:{[key:string]:Array<Array<Object>>}
     jsonEditor:JSONEditor
@@ -65,8 +89,9 @@ export default class WebsiteBuilder extends $.Tools.class {
      * @param options - Options for customizing editing behavior.
      * @returns Determined entry dom node.
      */
-    initialize(options:Object = {}):DomNode {
+    initialize(options:Object = {}):Promise<DomNode> {
         this._options = {
+            entryPointSelector: '[root]',
             inPlaceEditor: {
                 inline: true,
                 menubar: false,
@@ -138,70 +163,84 @@ export default class WebsiteBuilder extends $.Tools.class {
                 ]
             },
             retrieveContent: {},
-            schema: $.global.schema || {},
-            scope: $.global.scope || {},
-            selectedEditorIndicatorClassName: 'selected'
+            schema: null,
+            schemaName: 'schema',
+            scope: null,
+            scopeName: 'scope',
+            selectedEditorIndicatorClassName: 'selected',
+            waitForDocumentReady: true,
         }
         super.initialize(options)
-        this.extendObject(
-            true, JSONEditor.defaults.options, this._options.jsonEditor)
-        $.global.document.addEventListener('DOMContentLoaded', ():void => {
-            this.domNode = $.global.document.querySelector('[root]')
-            if (!this.domNode) {
-                this.domNode = $.global.document.createElement('div')
-                this.domNode.innerHTML = $.global.document.body.innerHTML
-                $.global.document.body.innerHTML = ''
-                $.global.document.body.appendChild(this.domNode)
-            }
-            this.template = this.domNode.innerHTML
-            this.updateMode()
-            for (
-                const div:PlainObject of
-                this._options.neededDomNodeSpecification.divs
-            ) {
-                const domNode:DomNode = $.global.document.createElement('div')
-                for (const key:string in div.style)
-                    if (div.style.hasOwnProperty(key))
-                        domNode.style[key] = div.style[key]
-                this.domNodes[div.name] = domNode
-                $.global.document.body.appendChild(domNode)
-            }
-            for (
-                const button:PlainObject of
-                this._options.neededDomNodeSpecification.buttons
-            ) {
-                button.state = button.states[0]
-                const domNode:DomNode = $.global.document.createElement(
-                    'button')
-                domNode.addEventListener('click', ():void => {
-                    button.state = button.states[
-                        (button.states.indexOf(button.state) + 1) %
-                        button.states.length
-                    ]
-                    domNode.textContent = button.label[button.state]
-                    button.action(button.state)
-                })
+        if (!this._options.schema)
+            this._options.schema = $.global[this._options.schemaName] || {}
+        if (!this._options.scope)
+            this._options.scope = $.global[this._options.scopeName] || {}
+        return new Promise((resolve:Function):void =>
+            this._options.waitForDocumentReady ?
+                $.global.document.addEventListener(
+                    'DOMContentLoaded', ():void => resolve(this.bootstrap())) :
+                resolve(this.bootstrap()))
+    }
+    /**
+     * Initializes editors.
+     * @returns Entry dom node.
+     */
+    bootstrap():void {
+        this.domNode = $.global.document.querySelector(
+            this._options.entryPointSelector)
+        if (!this.domNode) {
+            this.domNode = $.global.document.createElement('div')
+            this.domNode.innerHTML = $.global.document.body.innerHTML
+            $.global.document.body.innerHTML = ''
+            $.global.document.body.appendChild(this.domNode)
+        }
+        this.template = this.domNode.innerHTML
+        this.updateMode()
+        for (
+            const div:PlainObject of
+            this._options.neededDomNodeSpecifications.divs
+        ) {
+            const domNode:DomNode = $.global.document.createElement('div')
+            for (const key:string in div.style)
+                if (div.style.hasOwnProperty(key))
+                    domNode.style[key] = div.style[key]
+            this.domNodes[div.name] = domNode
+            $.global.document.body.appendChild(domNode)
+        }
+        for (
+            const button:PlainObject of
+            this._options.neededDomNodeSpecifications.buttons
+        ) {
+            button.state = button.states[0]
+            const domNode:DomNode = $.global.document.createElement('button')
+            domNode.addEventListener('click', ():void => {
+                button.state = button.states[
+                    (button.states.indexOf(button.state) + 1) %
+                    button.states.length
+                ]
                 domNode.textContent = button.label[button.state]
-                this.domNodes[button.name] = domNode
-                this.domNodes.toolbar.appendChild(domNode)
-            }
-            this.jsonEditor = new JSONEditor(
-                this.domNodes.jsonEditor, {schema: this._options.schema})
-            this.jsonEditor.setValue(this._options.scope.parameter)
-            this.jsonEditor.on('change', ():void => {
-                const errors = this.jsonEditor.validate()
-                if (errors.length)
-                    $.global.alert(errors[0])
-                else {
-                    this.extendObject(
-                        true, this._options.scope.parameter,
-                        this.jsonEditor.getValue())
-                    // TODO send data to parent context via post message.
-                    this.updateMode()
-                }
+                button.action(button.state)
             })
+            domNode.textContent = button.label[button.state]
+            this.domNodes[button.name] = domNode
+            this.domNodes.toolbar.appendChild(domNode)
+        }
+        this.jsonEditor = new JSONEditor(
+            this.domNodes.jsonEditor, this.constructor.extendObject(
+                this._options.jsonEditor, {schema: this._options.schema}))
+        this.jsonEditor.setValue(this._options.scope.parameter)
+        this.jsonEditor.on('change', ():void => {
+            const errors = this.jsonEditor.validate()
+            if (errors.length)
+                $.global.alert(errors[0])
+            else {
+                this.constructor.extendObject(
+                    true, this._options.scope.parameter,
+                    this.jsonEditor.getValue())
+                // TODO send data to parent context via post message.
+                this.updateMode()
+            }
         })
-        return this.domNode
     }
     /**
      * Tinymce uses color of target node for inline editing. For font color
@@ -343,7 +382,7 @@ export default class WebsiteBuilder extends $.Tools.class {
                         this._options.scope[name] = this.transformContent(
                             domNode.innerHTML)
                     domNode.addEventListener('click', ():void =>
-                        tinymce.init(this.extendObject(
+                        tinymce.init(this.constructor.extendObject(
                             {}, this._options.inPlaceEditor, {
                                 setup: (instance:Object):void => {
                                     tuple.push(instance)
@@ -397,8 +436,8 @@ export default class WebsiteBuilder extends $.Tools.class {
     // endregion
 }
 // endregion
-$.fn.WebsiteBuilder = function(...parameter:Array<any>):any {
-    return $.Tools().controller(WebsiteBuilder, parameter, this)
+$.WebsiteBuilder = function(...parameter:Array<any>):Promise<DomNode> {
+    return $.Tools().controller(WebsiteBuilder, parameter)
 }
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
