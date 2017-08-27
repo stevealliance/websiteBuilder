@@ -67,6 +67,6 @@ export class Application {}
 })
 export class ApplicationModule {}
 enableProdMode()
-websiteBuilder ? websiteBuilder.registerOnChange(():void =>
-    platformBrowserDynamic().bootstrapModule(ApplicationModule)
-) : platformBrowserDynamic().bootstrapModule(ApplicationModule)
+const main:Function = ():void => platformBrowserDynamic().bootstrapModule(
+    ApplicationModule)
+websiteBuilder ? websiteBuilder.registerOnChange(main) : main()
