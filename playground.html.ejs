@@ -13,10 +13,12 @@
 <html class="no-javascript" lang="en">
     <head>
         <meta charset="utf-8">
-        <!--Prevent browser caching-->
+        <base href="/" />
+        <!-- region prevent browser caching -->
         <meta http-equiv="cache-control" content="no-cache">
         <meta http-equiv="expires" content="0">
         <meta http-equiv="pragma" content="no-cache">
+        <!-- endregion -->
         <title>playground</title>
         <style>
             body {
@@ -24,6 +26,7 @@
                 padding: 0;
             }
         </style>
+        <!-- region scope -->
         <script>
             schema = {
                 title: 'options',
@@ -39,22 +42,101 @@
                 }
             }
         </script>
+        <!-- endregion -->
     </head>
     <body>
         <div root>
             <%%_ for (let index = 0; index < number; index += 1) { _%%>
-                <div bind-simple="simple">simple</div>
-                <div bind-simple-content="simpleContent">simpleContent</div>
+                <div simple-editable="simple">simple</div>
+                <div simple-initialized-editable="simpleContent">
+                    simpleContent
+                </div>
                 <hr />
-                <div bind="normal">normal</div>
-                <div bind-content="normalContent">normalContent</div>
+                <div editable="normal">normal</div>
+                <div initialized-editable="normalContent">normalContent</div>
                 <hr />
-                <div bind-advanced="advanced">advanced</div>
-                <div bind-advanced-content="advancedContent">advancedContent</div>
-                <div bind-advanced-content="advancedContentPlaceholder">Start - ${parameter.number} - advancedContent</div>
+                <div advanced-editable="advanced">advanced</div>
+                <div advanced-initialized-editable="advancedContent">
+                    advancedContent
+                </div>
+                <div
+                    advanced-initialized-editable="advancedContentPlaceholder"
+                >Start - ${parameter.number} - advancedContent</div>
             <%%_ } _%%>
+            <!-- region angular -->
+            <angular-application>
+                Angular is loading...
+            </angular-application>
+            <!-- endregion -->
+            <!-- region react -->
+            <react-application>
+                React is loading...
+            </react-application>
+            <!-- endregion -->
         </div>
-        <script>websiteBuilder.index.$.WebsiteBuilder()</script>
+        <script src="https://unpkg.com/systemjs@0.19.31/dist/system.js"></script>
+        <!-- region angular -->
+        <script src="https://unpkg.com/reflect-metadata@0.1.3/Reflect.js"></script>
+        <script src="https://unpkg.com/zone.js/dist/zone.js"></script>
+        <!-- endregion -->
+        <script>
+            websiteBuilder.index.$.WebsiteBuilder().then((websiteBuilder) => {
+                window.websiteBuilder = websiteBuilder
+                /*
+                    NOTE: Empty means to pick up latest one. Give format like
+                    "'@' + VERSION".
+                */
+                const version = {
+                    angular: '',
+                    react: '@15.6.1',
+                    reactDOM: '@15.6.1',
+                    rxjs: '',
+                    typescript: '@2.2.1'
+                }
+                // region angular
+                System.config({
+                    transpiler: 'typescript',
+                    typescriptOptions: {emitDecoratorMetadata: true},
+                    paths: {'npm:': 'https://unpkg.com/'},
+                    map: {
+                        '@angular/common': `npm:@angular/common${version.angular}/bundles/common.umd`,
+                        '@angular/compiler': `npm:@angular/compiler${version.angular}/bundles/compiler.umd`,
+                        '@angular/core': `npm:@angular/core${version.angular}/bundles/core.umd`,
+                        '@angular/platform-browser': `npm:@angular/platform-browser${version.angular}/bundles/platform-browser.umd`,
+                        '@angular/platform-browser-dynamic': `npm:@angular/platform-browser-dynamic${version.angular}/bundles/platform-browser-dynamic.umd`,
+                        rxjs: `npm:rxjs${version.rxjs}`,
+                        typescript: `npm:typescript${version.typescript}/lib/typescript`
+                    },
+                    packages: {rxjs: {defaultExtension: 'js'}}
+                })
+                System.import('angularApplication.ts').catch(
+                    console.error.bind(console))
+                // endregion
+                // region react
+                System = new System.constructor()
+                System.config({
+                    transpiler: 'plugin-babel',
+                    paths: {'npm:': 'https://unpkg.com/'},
+                    // Configure the Babel plugin - it's basically just telling it where to read the files from - in our case, they're in node_modules
+                    map: {
+                        'plugin-babel': 'npm:systemjs-plugin-babel/plugin-babel.js',
+                        react: `npm:react${version.react}/dist/react.min.js`,
+                        'react-dom': `npm:react-dom${version.reactDOM}/dist/react-dom.min.js`,
+                        'systemjs-babel-build': 'npm:systemjs-plugin-babel/systemjs-babel-browser.js'
+                    },
+                    meta: {
+                        '*.jsx': {
+                            babelOptions: {
+                                react: true
+                            }
+                        }
+                    }
+                })
+                System.import('reactApplication.jsx').catch(
+                    console.error.bind(console))
+                // endregion
+            })
+        </script>
     </body>
 <html>
 <%_ /*

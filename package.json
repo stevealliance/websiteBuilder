@@ -99,7 +99,27 @@
     },
     "module": {
       "optimizer": {
-        "babili": null
+        "babili": null,
+        "data": {
+          "exclude": "true"
+        },
+        "font": {
+          "eot": {
+            "exclude": "true"
+          },
+          "svg": {
+            "exclude": "true"
+          },
+          "ttf": {
+            "exclude": "true"
+          },
+          "woff": {
+            "exclude": "true"
+          }
+        },
+        "image": {
+          "exclude": "true"
+        }
       },
       "preprocessor": {
         "javaScript": {

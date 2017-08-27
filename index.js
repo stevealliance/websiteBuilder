@@ -47,10 +47,12 @@ import 'tinymce/plugins/table'
 import 'tinymce/plugins/contextmenu'
 import 'tinymce/plugins/paste'
 require.context(
-  'file?name=[path][name].[ext]&context=node_modules/tinymce!tinymce/skins',
+  'file?name=editorAssets.compiled/[path][name].[ext]&context=node_modules/tinymce!tinymce/skins',
   true,
   /.*/
 )
+
+import './index.css'
 // endregion
 export const $:any = binding
 // region plugins/classes
@@ -64,6 +66,8 @@ export const $:any = binding
  * @property inPlaceEditorInstances - Mapping from scope name to its mapped
  * list of dom nodes and in place editor instances.
  * @property jsonEditor - JSON editor instance.
+ * @property onChangeListener - A list of callbacks to call on parameter
+ * changes.
  * @property template - Determined template to render parameter into.
  */
 export default class WebsiteBuilder extends $.Tools.class {
@@ -81,17 +85,20 @@ export default class WebsiteBuilder extends $.Tools.class {
     domNodes:{[key:string]:DomNode} = {}
     domNode:DomNode
     inPlaceEditorInstances:{[key:string]:Array<Array<Object>>}
+    initialized:boolean = false
     jsonEditor:JSONEditor
+    onChangeListener:Array<Function> = []
     template:string = ''
     // endregion
     // region public methods
     /**
      * @param options - Options for customizing editing behavior.
-     * @returns Determined entry dom node.
+     * @returns A promise which resolves with current instance when
+     * bootstrapped.
      */
-    initialize(options:Object = {}):Promise<DomNode> {
+    initialize(options:Object = {}):Promise<WebsiteBuilder> {
         this._options = {
-            entryPointSelector: '[root]',
+            entryPointAttributeName: 'root',
             inPlaceEditor: {
                 inline: true,
                 menubar: false,
@@ -100,6 +107,7 @@ export default class WebsiteBuilder extends $.Tools.class {
                     'searchreplace visualblocks code fullscreen',
                     'insertdatetime media table contextmenu paste code'
                 ],
+                skin_url: 'editorAssets.compiled/skins/lightgray',
                 toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
             },
             jsonEditor: {
@@ -175,27 +183,30 @@ export default class WebsiteBuilder extends $.Tools.class {
             this._options.schema = $.global[this._options.schemaName] || {}
         if (!this._options.scope)
             this._options.scope = $.global[this._options.scopeName] || {}
-        return new Promise((resolve:Function):void =>
-            this._options.waitForDocumentReady ?
+        return new Promise((resolve:Function):void => {
+            if (this._options.waitForDocumentReady)
                 $.global.document.addEventListener(
-                    'DOMContentLoaded', ():void => resolve(this.bootstrap())) :
-                resolve(this.bootstrap()))
+                    'DOMContentLoaded', ():void => resolve(this.bootstrap()))
+            else
+                resolve(this.bootstrap())
+        })
     }
     /**
      * Initializes editors.
-     * @returns Entry dom node.
+     * @returns This instance..
      */
-    bootstrap():void {
+    bootstrap():WebsiteBuilder {
         this.domNode = $.global.document.querySelector(
-            this._options.entryPointSelector)
+            `[${this._options.entryPointAttributeName}]`)
         if (!this.domNode) {
             this.domNode = $.global.document.createElement('div')
+            this.domNode.setAttribute(
+                this._options.entryPointAttributeName, '')
             this.domNode.innerHTML = $.global.document.body.innerHTML
             $.global.document.body.innerHTML = ''
             $.global.document.body.appendChild(this.domNode)
         }
         this.template = this.domNode.innerHTML
-        this.updateMode()
         for (
             const div:PlainObject of
             this._options.neededDomNodeSpecifications.divs
@@ -230,6 +241,7 @@ export default class WebsiteBuilder extends $.Tools.class {
                 this._options.jsonEditor, {schema: this._options.schema}))
         this.jsonEditor.setValue(this._options.scope.parameter)
         this.jsonEditor.on('change', ():void => {
+            this.initialized = true
             const errors = this.jsonEditor.validate()
             if (errors.length)
                 $.global.alert(errors[0])
@@ -237,10 +249,76 @@ export default class WebsiteBuilder extends $.Tools.class {
                 this.constructor.extendObject(
                     true, this._options.scope.parameter,
                     this.jsonEditor.getValue())
-                // TODO send data to parent context via post message.
                 this.updateMode()
             }
         })
+        return this
+    }
+    /**
+     * Initializes all in place editors.
+     * @returns Nothing.
+     */
+    initializeInPlaceEditor():void {
+        this.inPlaceEditorInstances = {}
+        for (const type:string of ['', 'simple-', 'advanced-'])
+            for (const defaultType:string of ['', 'initialized-']) {
+                const attributeName:string = `${type}${defaultType}editable`
+                for (
+                    const domNode:DomNode of
+                    this.domNode.querySelectorAll(`[${attributeName}]`)
+                ) {
+                    const name:string = domNode.getAttribute(attributeName)
+                    if (!name)
+                        continue
+                    const tuple:Array<Object> = [domNode]
+                    if (this.inPlaceEditorInstances.hasOwnProperty(name))
+                        this.inPlaceEditorInstances[name].push(tuple)
+                    else
+                        this.inPlaceEditorInstances[name] = [tuple]
+                    if (this._options.scope.hasOwnProperty(name))
+                        domNode.innerHTML = this._options.scope[name]
+                    else if (defaultType === '')
+                        domNode.innerHTML = ''
+                    else
+                        this._options.scope[name] = this.transformContent(
+                            domNode.innerHTML)
+                    domNode.addEventListener('click', ():void =>
+                        tinymce.init(this.constructor.extendObject(
+                            {}, this._options.inPlaceEditor, {
+                                setup: (instance:Object):void => {
+                                    tuple.push(instance)
+                                    instance.on('init', ():void => {
+                                        instance.focus()
+                                        this._inPlaceEditorBackgroundColorFix()
+                                    })
+                                    instance.on('focus', ():void => {
+                                        const className:string = this._options
+                                            .selectedEditorIndicatorClassName
+                                        const lastSelectedDomNode:DomNode =
+                                            this.domNode.querySelector(
+                                                `.${className}`)
+                                        if (lastSelectedDomNode)
+                                            lastSelectedDomNode.classList
+                                                .remove(className)
+                                        domNode.classList.add(className)
+                                    })
+                                    instance.on('blur', domNode.blur.bind(
+                                        domNode))
+                                    // Update model on changes
+                                    instance.on('ExecCommand', ():void =>
+                                        this.updateModel(name, instance))
+                                    for (const eventName:string of [
+                                        'change', 'ObjectResized'
+                                    ])
+                                        instance.on(eventName, ():void => {
+                                            instance.save()
+                                            this.updateModel(name, instance)
+                                        })
+                                },
+                                target: domNode
+                            })))
+                }
+            }
     }
     /**
      * Tinymce uses color of target node for inline editing. For font color
@@ -249,7 +327,7 @@ export default class WebsiteBuilder extends $.Tools.class {
      * here to the same color as the first found button.
      * @returns Nothing.
      */
-    _inPlaceEditorBackfoundColorFix():void {
+    _inPlaceEditorBackgroundColorFix():void {
         for (const name:string of ['click', 'mouseover'])
             $.global.document.body.addEventListener(name, (
                 event:Object
@@ -289,12 +367,89 @@ export default class WebsiteBuilder extends $.Tools.class {
             WebsiteBuilder.escapedMarkupSymbolMapping[symbols])
     }
     /**
+     * Registers a callback to be triggered after a parameter change has been
+     * performed.
+     * @param callback - Function to trigger in change.
+     * @returns An unregister function.
+     */
+    registerOnChange(callback:Function):void {
+        this.onChangeListener.push(callback)
+        if (this.initialized)
+            callback(this.options, this.currentMode, this.domNode)
+        return ():void => {
+            const index:number = this.onChangeListener.indexOf(callback)
+            if (index !== -1)
+                this.onChangeListener.splice(index, 1)
+        }
+    }
+    /**
+     * Renders currently defined template parameter into the entry dom node.
+     * @returns Nothing.
+     */
+    renderParameter():void {
+        return this.domNode.innerHTML = ejs.render(
+            WebsiteBuilder.unescapeHTML(this.template),
+            this._options.scope.parameter)
+    }
+    /**
+     * Renders current scope values into the entry dom nodes content.
+     * @returns Nothing.
+     */
+    render():void {
+        for (const type:string of ['', 'simple-', 'advanced-'])
+            for (const defaultType:string of ['', 'initialized-']) {
+                const attributeName:string = `${type}${defaultType}editable`
+                for (
+                    const domNode:DomNode of
+                    this.domNode.querySelectorAll(`[${attributeName}]`)
+                ) {
+                    const name:string = domNode.getAttribute(attributeName)
+                    if (!name)
+                        continue
+                    domNode.innerHTML = ''
+                    if (this._options.scope.hasOwnProperty(name))
+                        domNode.innerHTML = new Function(
+                            // IgnoreTypeCheck
+                            ...Object.keys(this._options.scope),
+                            `return \`${this._options.scope[name]}\``
+                        )(...Object.values(this._options.scope))
+                }
+            }
+    }
+    /**
+     * Provides current data via post message to parent context.
+     * @returns Nothing.
+     */
+    populateData():void {
+        for (const callback:Function of this.onChangeListener)
+            callback(this.options, this.currentMode, this.domNode)
+        console.log('TODO send post message.', JSON.stringify(this._options.scope))
+    }
+    /**
      * Transforms content before exporting from an in place editor.
      * @param content - String to transform.
      * @returns Transformed given content.
      */
     transformContent(content:string):string {
         return content
+    }
+    /**
+     * Updates current editor mode into given one or currently set.
+     * @param mode - New mode to switch to.
+     * @returns Nothing.
+     */
+    updateMode(mode:?string):void {
+        if (mode)
+            this.currentMode = mode
+        for (const name:string of ['preview', 'hybrid', 'helper'])
+            this.domNode.classList.remove(name)
+        this.domNode.classList.add(this.currentMode)
+        this.renderParameter()
+        if (this.currentMode === 'preview')
+            this.render()
+        else
+            this.initializeInPlaceEditor()
+        this.populateData()
     }
     /**
      * Synchronizes in place editor content with each other.
@@ -318,121 +473,9 @@ export default class WebsiteBuilder extends $.Tools.class {
                     instance[1].setContent(content)
             } else
                 instance[0].innerHTML = content
+        this.populateData()
     }
-    /**
-     * Renders currently defined template parameter into the entry dom node.
-     * @returns Nothing.
-     */
-    renderParameter():void {
-        return this.domNode.innerHTML = ejs.render(
-            WebsiteBuilder.unescapeHTML(this.template),
-            this._options.scope.parameter)
-    }
-    /**
-     * Renders current scope values into the entry dom nodes content.
-     * @returns Nothing.
-     */
-    render():void {
-        for (const type:string of ['', '-simple', '-advanced'])
-            for (const defaultType:string of ['', '-content']) {
-                const attributeName:string = `bind${type}${defaultType}`
-                for (
-                    const domNode:DomNode of
-                    this.domNode.querySelectorAll(`[${attributeName}]`)
-                ) {
-                    const name:string = domNode.getAttribute(attributeName)
-                    if (!name)
-                        continue
-                    domNode.innerHTML = ''
-                    if (this._options.scope.hasOwnProperty(name))
-                        domNode.innerHTML = new Function(
-                            // IgnoreTypeCheck
-                            ...Object.keys(this._options.scope),
-                            `return \`${this._options.scope[name]}\``
-                        )(...Object.values(this._options.scope))
-                }
-            }
-    }
-    /**
-     * Initializes all in place editors.
-     * @returns Nothing.
-     */
-    initializeInPlaceEditor():void {
-        this.inPlaceEditorInstances = {}
-        for (const type:string of ['', '-simple', '-advanced'])
-            for (const defaultType:string of ['', '-content']) {
-                const attributeName:string = `bind${type}${defaultType}`
-                for (
-                    const domNode:DomNode of
-                    this.domNode.querySelectorAll(`[${attributeName}]`)
-                ) {
-                    const name:string = domNode.getAttribute(attributeName)
-                    if (!name)
-                        continue
-                    const tuple:Array<Object> = [domNode]
-                    if (this.inPlaceEditorInstances.hasOwnProperty(name))
-                        this.inPlaceEditorInstances[name].push(tuple)
-                    else
-                        this.inPlaceEditorInstances[name] = [tuple]
-                    if (this._options.scope.hasOwnProperty(name))
-                        domNode.innerHTML = this._options.scope[name]
-                    else if (defaultType === '')
-                        domNode.innerHTML = ''
-                    else
-                        this._options.scope[name] = this.transformContent(
-                            domNode.innerHTML)
-                    domNode.addEventListener('click', ():void =>
-                        tinymce.init(this.constructor.extendObject(
-                            {}, this._options.inPlaceEditor, {
-                                setup: (instance:Object):void => {
-                                    tuple.push(instance)
-                                    instance.on('init', ():void => {
-                                        instance.focus()
-                                        this._inPlaceEditorBackfoundColorFix()
-                                    })
-                                    instance.on('focus', ():void => {
-                                        const className:string = this._options
-                                            .selectedEditorIndicatorClassName
-                                        const lastSelectedDomNode:DomNode =
-                                            this.domNode.querySelector(
-                                                `.${className}`)
-                                        if (lastSelectedDomNode)
-                                            lastSelectedDomNode.classList
-                                                .remove(className)
-                                        domNode.classList.add(className)
-                                    })
-                                    instance.on('blur', domNode.blur.bind(
-                                        domNode))
-                                    // Update model on changes
-                                    instance.on('ExecCommand', ():void =>
-                                        this.updateModel(name, instance))
-                                    for (const eventName:string of [
-                                        'change', 'ObjectResized'
-                                    ])
-                                        instance.on(eventName, ():void => {
-                                            instance.save()
-                                            this.updateModel(name, instance)
-                                        })
-                                },
-                                target: domNode
-                            })))
-                }
-            }
-    }
-    /**
-     * Updates current editor mode into given one or currently set.
-     * @param mode - New mode to switch to.
-     * @returns Nothing.
-     */
-    updateMode(mode:?string):void {
-        if (mode)
-            this.currentMode = mode
-        this.renderParameter()
-        if (this.currentMode === 'preview')
-            this.render()
-        else
-            this.initializeInPlaceEditor()
-    }
+
     // endregion
 }
 // endregion
