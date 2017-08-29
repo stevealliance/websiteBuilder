@@ -95,8 +95,6 @@
                 }
                 // region angular
                 System.config({
-                    transpiler: 'typescript',
-                    typescriptOptions: {emitDecoratorMetadata: true},
                     paths: {'npm:': 'https://unpkg.com/'},
                     map: {
                         '@angular/common': `npm:@angular/common${version.angular}/bundles/common.umd`,
@@ -105,8 +103,7 @@
                         '@angular/platform-browser': `npm:@angular/platform-browser${version.angular}/bundles/platform-browser.umd`,
                         '@angular/platform-browser-dynamic': `npm:@angular/platform-browser-dynamic${version.angular}/bundles/platform-browser-dynamic.umd`,
                         '@angular/router': `npm:@angular/router${version.angular}/bundles/router.umd`,
-                        rxjs: `npm:rxjs${version.rxjs}`,
-                        typescript: `npm:typescript${version.typescript}/lib/typescript`
+                        rxjs: `npm:rxjs${version.rxjs}`
                     },
                     packages: {rxjs: {defaultExtension: 'js'}}
                 })
@@ -128,7 +125,9 @@
                     meta: {
                         '*.jsx': {
                             babelOptions: {
-                                react: true
+                                es2015: false,
+                                react: true,
+                                stage0: true
                             }
                         }
                     }

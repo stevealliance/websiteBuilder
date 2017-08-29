@@ -1,23 +1,43 @@
+// @flow
+// #!/usr/bin/env node
+// -*- coding: utf-8 -*-
+/** @module websiteBuilder */
+'use strict'
+/* !
+    region header
+    [Project page](http://torben.website/websiteBuilder)
+
+    Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
+
+    License
+    -------
+
+    This library written by torben sickert stand under a creative commons
+    naming 3.0 unported license.
+    see http://creativecommons.org/licenses/by/3.0/deed.de
+    endregion
+*/
+// region imports
 import {
     Component, Directive, ElementRef, enableProdMode, Injector, Input,
     NgModule, Optional, Renderer2, VERSION, ViewContainerRef
 } from '@angular/core'
 import {BrowserModule} from '@angular/platform-browser'
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic'
-import {ActivatedRoute, RouterModule} from '@angular/router'
-
-const camelCaseToDelimited:Function (string:string):string =>
-    string.replace(/([^-])([A-Z][a-z]+)/g, '$1-$2').replace(
-        /([a-z0-9])([A-Z])/g, '$1-$2'
-    ).toLowerCase()
+import {ActivatedRoute, RouterModule, UrlSegment} from '@angular/router'
+// NOTE: Only needed for debugging this file.
+try {
+    module.require('source-map-support/register')
+} catch (error) {}
+// endregion
 const attributeNames:Array<string> = [
     'editable', 'initializedEditable',
     'simpleEditable', 'simpleInitializedEditable',
     'advancedEditable', 'advancedInitializedEditable'
 ]
-const selector:string = ''
-for (const type:string of attributeNames)
-    selector += `,[${camelCaseToDelimited(type)}]`
+let selector:string = ''
+for (const name:string of attributeNames)
+    selector += `,[${name}]`
 @Directive({
     inputs: attributeNames,
     selector: selector.substring(1)
@@ -44,20 +64,24 @@ class Editable {
         while (true) {
             view = view.parent
             const index:number = view.nodes.filter(
-                (node) => node.instance
-            ).map((node) => node.instance).indexOf(component)
-            if ('parent' in view && view.parent && 'component' in view.parent) {
+                (node:Object) => node.instance
+            ).map((node:Object) => node.instance).indexOf(component)
+            if (
+                'parent' in view && view.parent && 'component' in view.parent
+            ) {
                 component = view.component
-                this.path = `${component.constructor.name}/${index}-${this.path}`
+                this.path =
+                    `${component.constructor.name}/${index}-${this.path}`
             } else
                 break
         }
         if (this.activatedRoute) {
             const paths:Array<string> =
                 this.activatedRoute.snapshot.pathFromRoot.map(
-                    (routeSnapshot) => routeSnapshot.url.map((urlSegment) =>
-                        urlSegment.path
-                    ).join('/')).filter((url) => url)
+                    (routeSnapshot:Object):Array<string> => routeSnapshot.url.map((
+                        urlSegment:UrlSegment
+                    ):string => urlSegment.path).join('/')
+                ).filter((url:string):boolean => Boolean(url))
             if (paths.length)
                 this.path = `${paths.join('/')}:${this.path}`
         }
@@ -90,17 +114,16 @@ class Editable {
                         this.elementReference.nativeElement, 'input', (
                             event:Object
                         ):void => websiteBuilder.updateModel(
-                            this.path, this.elementReference.nativeElement)
+                            this.path, this.elementReference.nativeElement))
                 } else
                     this.renderer.removeAttribute(
-                        this.elementReference.nativeElement,
-                        camelCaseToDelimited(name))
+                        this.elementReference.nativeElement, name)
                 break
             }
     }
 }
 
-
+// region test
 @Component({
     selector: 'a',
     template: `
@@ -161,9 +184,14 @@ export class Application {}
     bootstrap: [Application]
 })
 export class ApplicationModule {}
-enableProdMode()
-
+// endregion
 
 const main:Function = ():void => platformBrowserDynamic().bootstrapModule(
     ApplicationModule)
-websiteBuilder ? websiteBuilder.registerOnChange((parameter) => parameter ? main() : null) : main()
+websiteBuilder ? websiteBuilder.registerOnChange((
+    parameterHasChanged:boolean
+) => parameterHasChanged ? main() : null) : main()
+// region vim modline
+// vim: set tabstop=4 shiftwidth=4 expandtab:
+// vim: foldmethod=marker foldmarker=region,endregion:
+// endregion

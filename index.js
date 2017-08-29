@@ -338,13 +338,15 @@ export default class WebsiteBuilder extends $.Tools.class {
     }
     /**
      * Provides current data via post message to parent context.
-     * @param parameter - Indicates whether in place content has been updated
-     * or template parameter.
+     * @param parameterHasChanged - Indicates whether in place content has been
+     * updated or template parameter.
      * @returns Nothing.
      */
-    populateData(parameter:boolean = true):void {
+    populateData(parameterHasChanged:boolean = true):void {
         for (const callback:Function of this.onChangeListener)
-            callback(parameter, this.options, this.currentMode, this.domNode)
+            callback(
+                parameterHasChanged, this.options, this.currentMode,
+                this.domNode)
         console.log('TODO Send data: ', this.scope)
     }
 
@@ -527,9 +529,8 @@ export default class WebsiteBuilder extends $.Tools.class {
     // endregion
 }
 // endregion
-$.WebsiteBuilder = function(...parameter:Array<any>):Promise<DomNode> {
-    return $.Tools().controller(WebsiteBuilder, parameter)
-}
+$.WebsiteBuilder = (...parameter:Array<any>):Promise<DomNode> =>
+    $.Tools().controller(WebsiteBuilder, parameter)
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:

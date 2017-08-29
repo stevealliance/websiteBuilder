@@ -16,4 +16,6 @@ class Application extends React.Component {
 }
 const main = () => ReactDOM.render(
     <Application />, window.document.querySelector('react-application'))
-websiteBuilder ? websiteBuilder.registerOnChange(main) : main()
+websiteBuilder ? websiteBuilder.registerOnChange((parameterHasChanged) =>
+    parameterHasChanged ? main () : null
+) : main()
