@@ -2,7 +2,7 @@
 // #!/usr/bin/env node
 // -*- coding: utf-8 -*-
 /** @module websiteBuilder */
-// TODO 'use strict'
+'use strict'
 /* !
     region header
     [Project page](http://torben.website/websiteBuilder)
@@ -21,11 +21,8 @@
 import {Component, enableProdMode, NgModule, VERSION} from '@angular/core'
 import {BrowserModule} from '@angular/platform-browser'
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic'
+import {RouterModule} from '@angular/router'
 import Editable from './angular'
-// NOTE: Only needed for debugging this file.
-try {
-    module.require('source-map-support/register')
-} catch (error) {}
 // endregion
 @Component({
     selector: 'a',
@@ -33,7 +30,7 @@ try {
         <b></b>
     `
 })
-export class A {}
+class A {}
 @Component({
     selector: 'b',
     template: `
@@ -48,14 +45,14 @@ export class A {}
         </div>
     `
 })
-export class B {}
+class B {}
 @Component({
     selector: 'angular-application',
     template: `
         <router-outlet></router-outlet>
     `
 })
-export class Application {}
+class Application {}
 @NgModule({
     imports: [
         BrowserModule,
@@ -86,13 +83,9 @@ export class Application {}
     ],
     bootstrap: [Application]
 })
-export class ApplicationModule {}
-// endregion
-const main:Function = ():void => platformBrowserDynamic().bootstrapModule(
+class ApplicationModule {}
+export default ():void => platformBrowserDynamic().bootstrapModule(
     ApplicationModule)
-websiteBuilder ? websiteBuilder.registerOnChange((
-    parameterHasChanged:boolean
-) => parameterHasChanged ? main() : null) : main()
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:

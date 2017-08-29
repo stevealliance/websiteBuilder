@@ -23,7 +23,7 @@ import {globalContext} from 'clientnode'
 import {
     Directive, ElementRef, Injector, Input, Optional, Renderer2
 } from '@angular/core'
-import {ActivatedRoute, RouterModule, UrlSegment} from '@angular/router'
+import {ActivatedRoute, UrlSegment} from '@angular/router'
 // NOTE: Only needed for debugging this file.
 try {
     module.require('source-map-support/register')
