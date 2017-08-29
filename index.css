@@ -10,12 +10,12 @@ This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. see http://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
 [root].helper {
-    & [bind],
-    & [bind-content],
-    & [bind-simple],
-    & [bind-simple-content],
-    & [bind-advanced],
-    & [bind-advanced-content] {
+    & [editable],
+    & [initialized-editable],
+    & [simple-editable],
+    & [simple-initialized-editable],
+    & [advanced-editable],
+    & [advanced-initialized-editable] {
         border: 1px dashed grey;
     }
 }

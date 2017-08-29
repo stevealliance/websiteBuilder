@@ -47,21 +47,21 @@
     <body>
         <div root>
             <%%_ for (let index = 0; index < number; index += 1) { _%%>
-                <div simple-editable="simple">simple</div>
-                <div simple-initialized-editable="simpleContent">
+                <div simpleEditable="simple">simple</div>
+                <div simpleInitializedEditable="simpleContent">
                     simpleContent
                 </div>
                 <hr />
                 <div editable="normal">normal</div>
-                <div initialized-editable="normalContent">normalContent</div>
+                <div initializedEditable="normalContent">normalContent</div>
                 <hr />
-                <div advanced-editable="advanced">advanced</div>
-                <div advanced-initialized-editable="advancedContent">
+                <div advancedEditable="advanced">advanced</div>
+                <div advancedInitializedEditable="advancedContent">
                     advancedContent
                 </div>
-                <div
-                    advanced-initialized-editable="advancedContentPlaceholder"
-                >Start - ${parameter.number} - advancedContent</div>
+                <div advancedInitializedEditable="advancedContentPlaceholder">
+                    Start - ${parameter.number} - advancedContent
+                </div>
             <%%_ } _%%>
             <!-- region angular -->
             <angular-application>
@@ -104,6 +104,7 @@
                         '@angular/core': `npm:@angular/core${version.angular}/bundles/core.umd`,
                         '@angular/platform-browser': `npm:@angular/platform-browser${version.angular}/bundles/platform-browser.umd`,
                         '@angular/platform-browser-dynamic': `npm:@angular/platform-browser-dynamic${version.angular}/bundles/platform-browser-dynamic.umd`,
+                        '@angular/router': `npm:@angular/router${version.angular}/bundles/router.umd`,
                         rxjs: `npm:rxjs${version.rxjs}`,
                         typescript: `npm:typescript${version.typescript}/lib/typescript`
                     },
