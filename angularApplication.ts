@@ -25,6 +25,7 @@ import {
 import {BrowserModule} from '@angular/platform-browser'
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic'
 import {ActivatedRoute, RouterModule, UrlSegment} from '@angular/router'
+class InitialDataService {}
 // NOTE: Only needed for debugging this file.
 try {
     module.require('source-map-support/register')
@@ -43,17 +44,21 @@ for (const name:string of attributeNames)
     selector: selector.substring(1)
 })
 class Editable {
-    activatedRoute:ActivatedRoute
+    activatedRoute:?ActivatedRoute
+    contextPath:string = ''
     elementReference:ElementRef
+    initialData:?InitialDataService
     injector:Injector
     renderer:Renderer2
-    contextPath:string = ''
+    scope:Object = {}
     constructor(
         @Optional() activatedRoute:ActivatedRoute, elementReference:ElementRef,
-        injector:Injector, renderer:Renderer2
+        @Optional() initialData:InitialDataService, injector:Injector,
+        renderer:Renderer2
     ) {
         this.activatedRoute = activatedRoute
         this.elementReference = elementReference
+        this.initialData = initialData
         this.injector = injector
         this.renderer = renderer
     }
@@ -89,6 +94,12 @@ class Editable {
     }
     ngOnInit():void {
         this.determinePath()
+        if (websiteBuilder)
+            this.scope = websiteBuilder.scope
+        else if (this.initialData && this.initialData.scope)
+            this.scope = this.initialData.scope
+        else if (scope)
+            this.scope = scope
         for (const name:string of attributeNames)
             if (
                 this.hasOwnProperty(name) &&
@@ -96,31 +107,37 @@ class Editable {
                 this[name]
             ) {
                 this.contextPath += `:${this[name]}`
+                if (!name.toLowerCase().includes('initialized'))
+                    this.renderer.setProperty(
+                        this.elementReference.nativeElement, 'innerHTML', '')
                 if (websiteBuilder) {
-                    if (!name.toLowerCase().includes('initialized'))
-                        this.elementReference.nativeElement.innerHTML = ''
                     if (websiteBuilder.currentMode === 'preview') {
                         websiteBuilder.renderDomNode(
                             this.contextPath,
                             this.elementReference.nativeElement)
                         break
                     }
+                    const tuple:Array<Object> = [
+                        this.elementReference.nativeElement]
+                    // TODO use tinymce
                     this.renderer.setAttribute(
                         this.elementReference.nativeElement,
                         'contenteditable', '')
                     websiteBuilder.registerInPlaceEditor(
-                        this.contextPath, [this.elementReference.nativeElement])
+                        this.contextPath, tuple)
                     websiteBuilder.updateModel(
                         this.contextPath, this.elementReference.nativeElement,
                         true)
+                    // TODO
                     this.renderer.listen(
                         this.elementReference.nativeElement, 'input', (
                             event:Object
                         ):void => websiteBuilder.updateModel(
                             this.contextPath, this.elementReference.nativeElement))
-                } else
-                    this.renderer.removeAttribute(
-                        this.elementReference.nativeElement, name)
+                } else if (this[name] in this.scope)
+                    this.renderer(
+                        this.elementReference.nativeElement, 'innerHTML',
+                        this.scope[this[name]])
                 break
             }
     }

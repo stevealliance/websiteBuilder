@@ -118,6 +118,10 @@ export default class WebsiteBuilder extends $.Tools.class {
      */
     initialize(options:Object = {}):Promise<WebsiteBuilder> {
         this._options = {
+            className: {
+                selectedEditorIndicator: 'selected',
+                synchronizedEditorTemplateValue: 'synchronized'
+            },
             entryPointAttributeName: 'root',
             inPlaceEditor: {
                 inline: true,
@@ -195,7 +199,6 @@ export default class WebsiteBuilder extends $.Tools.class {
             schemaName: 'schema',
             scope: null,
             scopeName: 'scope',
-            selectedEditorIndicatorClassName: 'selected',
             waitForDocumentReady: true,
         }
         super.initialize(options)
@@ -310,7 +313,7 @@ export default class WebsiteBuilder extends $.Tools.class {
                                 })
                                 instance.on('focus', ():void => {
                                     const className:string = this._options
-                                        .selectedEditorIndicatorClassName
+                                        .className.selectedEditorIndicator
                                     const lastSelectedDomNode:DomNode =
                                         this.domNode.querySelector(
                                             `.${className}`)
@@ -345,7 +348,7 @@ export default class WebsiteBuilder extends $.Tools.class {
     populateData(parameterHasChanged:boolean = true):void {
         for (const callback:Function of this.onChangeListener)
             callback(
-                parameterHasChanged, this.options, this.currentMode,
+                parameterHasChanged, this.currentMode, this.options,
                 this.domNode)
         console.log('TODO Send data: ', this.scope)
     }
@@ -371,7 +374,7 @@ export default class WebsiteBuilder extends $.Tools.class {
     registerOnChange(callback:Function):void {
         this.onChangeListener.push(callback)
         if (this.initialized)
-            callback(true, this.options, this.currentMode, this.domNode)
+            callback(true, this.currentMode, this.options, this.domNode)
         return ():void => {
             const index:number = this.onChangeListener.indexOf(callback)
             if (index !== -1)
@@ -473,9 +476,11 @@ export default class WebsiteBuilder extends $.Tools.class {
             if (name in this.scope)
                 content = this.scope[name]
         }
+        let inSyncWithTemplate:boolean = false
         if (this.initialScope[name] === content) {
             if (name in this.scope)
                 delete this.scope[name]
+            inSyncWithTemplate = true
         } else
             this.scope[name] = content
         for (
@@ -495,6 +500,12 @@ export default class WebsiteBuilder extends $.Tools.class {
             } else if (instance[0].innerHTML !== content)
                 instance[0].innerHTML = content
             instance[0].setAttribute('title', name)
+            if (inSyncWithTemplate && instance.includes(givenInstance))
+                instance[0].classList.add(
+                    this._options.className.synchronizedEditorTemplateValue)
+            else
+                instance[0].classList.remove(
+                    this._options.className.synchronizedEditorTemplateValue)
         }
         this.populateData(false)
     }

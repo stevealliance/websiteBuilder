@@ -11,12 +11,16 @@ This library written by Torben Sickert stand under a creative commons naming
 endregion */
 [root].helper {
     & [editable],
-    & [initialized-editable],
-    & [simple-editable],
-    & [simple-initialized-editable],
-    & [advanced-editable],
-    & [advanced-initialized-editable] {
+    & [initializedEditable],
+    & [simpleEditable],
+    & [simpleInitializedEditable],
+    & [advancedEditable],
+    & [advancedInitializedEditable] {
         border: 1px dashed grey;
+
+        &.synchronized {
+            border-color: green;
+        }
     }
 }
 /* region vim modline
