@@ -18,15 +18,17 @@
     endregion
 */
 // region imports
+import GenericModule, {InitialDataService} from 'angular-generic'
 import {Component, enableProdMode, NgModule, VERSION} from '@angular/core'
 import {BrowserModule} from '@angular/platform-browser'
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic'
-import {RouterModule} from '@angular/router'
+import {Router, RouterModule} from '@angular/router'
 import Editable from './angular'
 // endregion
 @Component({
     selector: 'a',
     template: `
+        <h2>A</h2>
         <b></b>
     `
 })
@@ -34,6 +36,7 @@ class A {}
 @Component({
     selector: 'b',
     template: `
+        <h2>B</h2>
         <div>
             <span simpleInitializedEditable="greeting">
                 Hello angular version
@@ -53,39 +56,49 @@ class B {}
     `
 })
 class Application {}
-@NgModule({
-    bootstrap: [Application],
-    declarations: [
-        Application,
-        A,
-        B,
-        Editable
-    ],
-    imports: [
-        BrowserModule,
-        RouterModule.forRoot(
-            [
-                {
-                    children: [
-                        {
-                            component: A,
-                            path: 'B'
-                        }
-                    ],
-                    component: Application,
-                    path: 'A'
-                },
-                {
-                    path: '**',
-                    redirectTo: 'A/B'
-                }
-            ]
-        )
-    ]
-})
-class ApplicationModule {}
-export default ():void => platformBrowserDynamic().bootstrapModule(
-    ApplicationModule)
+export default ():void => {
+    @NgModule({
+        bootstrap: [Application],
+        declarations: [
+            Application,
+            A,
+            B,
+            Editable
+        ],
+        imports: [
+            BrowserModule,
+            GenericModule,
+            RouterModule.forRoot(
+                [
+                    {
+                        children: [
+                            {
+                                component: B,
+                                path: 'B'
+                            },
+                            {
+                                component: A,
+                                path: 'A'
+                            }
+                        ],
+                        component: Application,
+                        path: 'A'
+                    },
+                    {
+                        path: '**',
+                        redirectTo: '/A/A'
+                    }
+                ]
+            )
+        ]
+    })
+    class ApplicationModule {
+        constructor(initialData:InitialDataService, router:Router):void {
+            router.navigate([initialData.path])
+        }
+    }
+    platformBrowserDynamic().bootstrapModule(ApplicationModule)
+}
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:

@@ -58,7 +58,7 @@
     "tinymce": "^4.6.5"
   },
   "peerDependencies": {
-    "angular-generic": "^1.0.280",
+    "angular-generic": "^1.0.281",
     "@angular/animations": "^4.2.6",
     "@angular/common": "^4.2.6",
     "@angular/compiler": "^4.2.6",

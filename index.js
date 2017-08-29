@@ -122,6 +122,7 @@ export default class WebsiteBuilder extends $.Tools.class {
                 selectedEditorIndicator: 'selected',
                 synchronizedEditorTemplateValue: 'synchronized'
             },
+            defaultParameterScope: {},
             entryPointAttributeName: 'root',
             inPlaceEditor: {
                 inline: true,
@@ -427,7 +428,9 @@ export default class WebsiteBuilder extends $.Tools.class {
     renderParameter():void {
         return this.domNode.innerHTML = ejs.render(
             WebsiteBuilder.unescapeHTML(this.template),
-            this.scope.parameter)
+            this.constructor.extendObject(
+                true, {Tools: this.constructor},
+                this._options.defaultParameterScope, this.scope.parameter))
     }
     /**
      * Transforms content before exporting from an in place editor.

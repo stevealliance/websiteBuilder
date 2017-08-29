@@ -32,14 +32,16 @@
                 title: 'options',
                 properties: {
                     number: {type: 'integer'},
-                    path: {type: 'string'}
+                    path: {
+                        enum: ['/A/A', '/A/B'],
+                        type: 'string'
+                    }
                 }
             }
-            scope = {
-                parameter: {
-                    number: 1
-                }
-            }
+            scope = {parameter: {
+                number: 1,
+                path: '/A/A'
+            }}
         </script>
         <!-- endregion -->
     </head>
@@ -62,7 +64,12 @@
                     Start - ${parameter.number} - advancedContent
                 </div>
             <%%_ } _%%>
-            <application>Application is loading...</application>
+            <%%_
+                const data = Tools.convertCircularObjectToJSON({path})
+            _%%>
+            <application initialData="<%%= data %%>">
+                Application is loading...
+            </application>
         </div>
         <script>
             websiteBuilder.index.$.WebsiteBuilder().then((instance) => {
