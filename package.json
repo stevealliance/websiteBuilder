@@ -75,6 +75,7 @@
     "@angular/platform-browser-dynamic": "^4.2.6",
     "@angular/router": "^4.2.6",
     "babel-eslint": "^7.2.3",
+    "babel-plugin-angular2-annotations": "^5.1.0",
     "babel-plugin-transform-proto-to-assign": "^6.23.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.6.0",
