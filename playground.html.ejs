@@ -31,9 +31,8 @@
             schema = {
                 title: 'options',
                 properties: {
-                    number: {
-                        type: 'integer'
-                    }
+                    number: {type: 'integer'},
+                    path: {type: 'string'}
                 }
             }
             scope = {
@@ -63,12 +62,8 @@
                     Start - ${parameter.number} - advancedContent
                 </div>
             <%%_ } _%%>
-            <!-- region angular -->
             <application>Application is loading...</application>
-            <!-- endregion -->
         </div>
-        <script src="https://unpkg.com/systemjs@0.19.31/dist/system.js">
-        </script>
         <script>
             websiteBuilder.index.$.WebsiteBuilder().then((instance) => {
                 const runTestApplication =
