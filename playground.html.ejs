@@ -107,7 +107,8 @@
                         typescript: `npm:typescript${version.typescript}`
                     },
                     packages: {rxjs: {defaultExtension: 'js'}},
-                    transpiler: 'typescript'
+                    transpiler: 'typescript',
+                    typescriptOptions: {emitDecoratorMetadata: true}
                 })
                 System.import('angularApplication.ts').catch(
                     console.error.bind(console))

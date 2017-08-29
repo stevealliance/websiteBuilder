@@ -405,15 +405,11 @@ export default class WebsiteBuilder extends $.Tools.class {
         const content:string =
             this.scope.hasOwnProperty(name) ? this.scope[name] :
             domNode.innerHTML
-        const validNames:Array<string> =
-            Object.keys(this.scope).filter((name:string):boolean =>
-                /^[a-zA-Z_]+$/.test(name))
         // IgnoreTypeCheck
         domNode.innerHTML =
             content ? new Function(
-                'scope', ...validNames, `return \`${content}\``
-            )(this.scope, ...validNames.map((name:string):any =>
-                this.scope[name])) :
+                ...Object.keys(this.scope).map((name:string):string => name.replace(/\//g, '$')), `return \`${content}\``
+            )(...Object.values(this.scope)) :
             ''
     }
     /**

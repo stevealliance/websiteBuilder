@@ -47,7 +47,7 @@ class Editable {
     elementReference:ElementRef
     injector:Injector
     renderer:Renderer2
-    path:string = ''
+    contextPath:string = ''
     constructor(
         @Optional() activatedRoute:ActivatedRoute, elementReference:ElementRef,
         injector:Injector, renderer:Renderer2
@@ -60,7 +60,7 @@ class Editable {
     determinePath():void {
         let view:Object = this.injector.view
         let component:string = view.component
-        this.path += component.constructor.name
+        this.contextPath += component.constructor.name
         while (true) {
             view = view.parent
             const index:number = view.nodes.filter(
@@ -70,8 +70,9 @@ class Editable {
                 'parent' in view && view.parent && 'component' in view.parent
             ) {
                 component = view.component
-                this.path =
-                    `${component.constructor.name}/${index}-${this.path}`
+                this.contextPath =
+                    `${component.constructor.name}/${index}-` +
+                    this.contextPath
             } else
                 break
         }
@@ -83,7 +84,7 @@ class Editable {
                     ):string => urlSegment.path).join('/')
                 ).filter((url:string):boolean => Boolean(url))
             if (paths.length)
-                this.path = `${paths.join('/')}:${this.path}`
+                this.contextPath = `${paths.join('/')}:${this.contextPath}`
         }
     }
     ngOnInit():void {
@@ -94,27 +95,29 @@ class Editable {
                 typeof this[name] === 'string' &&
                 this[name]
             ) {
-                this.path += `:${this[name]}`
+                this.contextPath += `:${this[name]}`
                 if (websiteBuilder) {
                     if (!name.toLowerCase().includes('initialized'))
                         this.elementReference.nativeElement.innerHTML = ''
                     if (websiteBuilder.currentMode === 'preview') {
                         websiteBuilder.renderDomNode(
-                            this.path, this.elementReference.nativeElement)
+                            this.contextPath,
+                            this.elementReference.nativeElement)
                         break
                     }
                     this.renderer.setAttribute(
                         this.elementReference.nativeElement,
                         'contenteditable', '')
                     websiteBuilder.registerInPlaceEditor(
-                        this.path, [this.elementReference.nativeElement])
+                        this.contextPath, [this.elementReference.nativeElement])
                     websiteBuilder.updateModel(
-                        this.path, this.elementReference.nativeElement, true)
+                        this.contextPath, this.elementReference.nativeElement,
+                        true)
                     this.renderer.listen(
                         this.elementReference.nativeElement, 'input', (
                             event:Object
                         ):void => websiteBuilder.updateModel(
-                            this.path, this.elementReference.nativeElement))
+                            this.contextPath, this.elementReference.nativeElement))
                 } else
                     this.renderer.removeAttribute(
                         this.elementReference.nativeElement, name)
@@ -135,10 +138,10 @@ export class A {}
     selector: 'b',
     template: `
         <div>
-            <span simple-initialized-editable="greeting">
+            <span simpleInitializedEditable="greeting">
                 Hello angular version
             </span>
-            <div style="width: 100px; height: 100px" simple-editable="greeting2">
+            <div style="width: 100px; height: 100px" simpleEditable="greeting2">
                 Hello angular version
             </div>
             ${VERSION.full}
