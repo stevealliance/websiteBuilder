@@ -22,6 +22,8 @@
     "representation"
   ],
   "files": [
+    "angular.js",
+    "angular.compiled.js",
     "index.js",
     "index.css",
     "index.compiled.css"
@@ -54,7 +56,24 @@
     "json-editor": "^0.7.28",
     "tinymce": "^4.6.5"
   },
+  "peerDependencies": {
+    "@angular/common": "^4.2.6",
+    "@angular/compiler": "^4.2.6",
+    "@angular/core": "^4.2.6",
+    "@angular/platform-browser": "^4.2.6",
+    "@angular/platform-browser-dynamic": "^4.2.6",
+    "@angular/router": "^4.2.6",
+    "reflect-metadata": "^0.1.10",
+    "rxjs": "^5.4.2",
+    "zone.js": "^0.8.14"
+  },
   "devDependencies": {
+    "@angular/common": "^4.2.6",
+    "@angular/compiler": "^4.2.6",
+    "@angular/core": "^4.2.6",
+    "@angular/platform-browser": "^4.2.6",
+    "@angular/platform-browser-dynamic": "^4.2.6",
+    "@angular/router": "^4.2.6",
     "babel-eslint": "^7.2.3",
     "babel-plugin-transform-proto-to-assign": "^6.23.0",
     "babel-polyfill": "^6.23.0",
@@ -66,11 +85,14 @@
     "eslint-plugin-jsdoc": "^3.1.1",
     "flow-bin": "^0.50.0",
     "jsdoc": "^3.5.2",
+    "reflect-metadata": "^0.1.10",
+    "rxjs": "^5.4.2",
     "source-map-support": "^0.4.15",
     "stylelint": "^7.13.0",
     "weboptimizer": "^1.0.360",
     "webpack": "^3.2.0",
-    "webpack-dev-server": "^2.5.1"
+    "webpack-dev-server": "^2.5.1",
+    "zone.js": "^0.8.14"
   },
   "webOptimizer": {
     "injection": {
@@ -86,6 +108,12 @@
         }
       },
       "internal": {
+        "angular": {
+          "__evaluate__": "(self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'build' ? [] : ['reflect-metadata', 'zone.js']).concat(self.givenCommandLineArguments.length && ['test', 'test:browser'].includes(self.givenCommandLineArguments[2]) ? [] : './angular')"
+        },
+        "index": {
+          "__evaluate__": "(self.givenCommandLineArguments.length && ['build:dll', 'serve', 'test:browser', 'watch:dll'].includes(self.givenCommandLineArguments[2]) ? `webpack-dev-server/client?http${self.development.server.cert ? 's' : ''}://0.0.0.0:${self.development.server.port}` : []).concat(self.givenCommandLineArguments.length && ['test', 'test:browser'].includes(self.givenCommandLineArguments[2]) ? './test' : './index')"
+        },
         "vendor": {
           "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['build:dll', 'serve', 'test:browser', 'watch:dll'].includes(self.givenCommandLineArguments[2]) ? ['babel-polyfill', 'clientnode'].concat(self.givenCommandLineArguments[2] === 'serve' ? [] : ['script!qunitjs', 'weboptimizer/browserAPI']) : []"
         }
@@ -98,6 +126,9 @@
       }
     },
     "module": {
+      "aliases": {
+        "clientnode/test$": "clientnode/test.compiled"
+      },
       "optimizer": {
         "babili": null,
         "data": {
@@ -124,6 +155,13 @@
       "preprocessor": {
         "javaScript": {
           "options": {
+            "plugins": {
+              "__prepend__": [
+                "angular2-annotations",
+                "transform-decorators-legacy"
+              ],
+              "__remove__": "transform-runtime"
+            },
             "presets": {
               "__evaluate__": "(self.targetTechnology === 'node' ? ['es2017-node7'] : [['modern-browsers', {loose: true}], 'es2017']).concat('stage-0')"
             }
@@ -131,8 +169,15 @@
         }
       },
       "replacements": {
+        "context": [
+          [
+            "/angular(\\\\|\\/)core(\\\\|\\/)(esm(\\\\|\\/)src|src)(\\\\|\\/)linker/",
+            "__dirname"
+          ]
+        ],
         "normal": {
-          "^clientnode/test$": "clientnode/test.compiled.js"
+          "^DOESNT WORK: rxjs(?:/.+)?$": "rxjs/bundles/Rx.min.js",
+          "^DOESNT WORK IN NODE: zone\\.js(?:/.+)?$": "zone.js/dist/zone.min.js"
         }
       },
       "skipParseRegularExpressions": {

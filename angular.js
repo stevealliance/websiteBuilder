@@ -108,7 +108,7 @@ export default class Editable {
                 if (!name.toLowerCase().includes('initialized'))
                     this.renderer.setProperty(
                         this.elementReference.nativeElement, 'innerHTML', '')
-                if (’websiteBuilder' in globalContext) {
+                if ('websiteBuilder' in globalContext) {
                     if (
                         globalContext.websiteBuilder.currentMode === 'preview'
                     ) {
