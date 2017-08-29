@@ -21,6 +21,7 @@
 import {Component, enableProdMode, NgModule, VERSION} from '@angular/core'
 import {BrowserModule} from '@angular/platform-browser'
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic'
+import Editable from './angular'
 // NOTE: Only needed for debugging this file.
 try {
     module.require('source-map-support/register')
