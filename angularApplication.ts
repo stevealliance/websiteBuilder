@@ -2,7 +2,7 @@
 // #!/usr/bin/env node
 // -*- coding: utf-8 -*-
 /** @module websiteBuilder */
-'use strict'
+// TODO 'use strict'
 /* !
     region header
     [Project page](http://torben.website/websiteBuilder)

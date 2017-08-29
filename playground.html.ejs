@@ -103,9 +103,11 @@
                         '@angular/platform-browser': `npm:@angular/platform-browser${version.angular}/bundles/platform-browser.umd`,
                         '@angular/platform-browser-dynamic': `npm:@angular/platform-browser-dynamic${version.angular}/bundles/platform-browser-dynamic.umd`,
                         '@angular/router': `npm:@angular/router${version.angular}/bundles/router.umd`,
-                        rxjs: `npm:rxjs${version.rxjs}`
+                        rxjs: `npm:rxjs${version.rxjs}`,
+                        typescript: `npm:typescript${version.typescript}`
                     },
-                    packages: {rxjs: {defaultExtension: 'js'}}
+                    packages: {rxjs: {defaultExtension: 'js'}},
+                    transpiler: 'typescript'
                 })
                 System.import('angularApplication.ts').catch(
                     console.error.bind(console))

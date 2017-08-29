@@ -297,7 +297,7 @@ export default class WebsiteBuilder extends $.Tools.class {
                     continue
                 const tuple:Array<Object> = [domNode]
                 this.registerInPlaceEditor(name, tuple)
-                if (defaultType === '')
+                if (!attributeName.toLowerCase().includes('initialized'))
                     domNode.innerHTML = ''
                 domNode.addEventListener('click', ():void =>
                     tinymce.init(this.constructor.extendObject(
