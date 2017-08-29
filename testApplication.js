@@ -47,13 +47,20 @@ class A {}
 })
 class B {}
 @Component({
-    selector: 'angular-application',
+    selector: 'application',
     template: `
         <router-outlet></router-outlet>
     `
 })
 class Application {}
 @NgModule({
+    bootstrap: [Application],
+    declarations: [
+        Application,
+        A,
+        B,
+        Editable
+    ],
     imports: [
         BrowserModule,
         RouterModule.forRoot(
@@ -74,14 +81,7 @@ class Application {}
                 }
             ]
         )
-    ],
-    declarations: [
-        Application,
-        A,
-        B,
-        Editable
-    ],
-    bootstrap: [Application]
+    ]
 })
 class ApplicationModule {}
 export default ():void => platformBrowserDynamic().bootstrapModule(
