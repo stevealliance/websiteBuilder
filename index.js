@@ -415,6 +415,7 @@ export default class WebsiteBuilder extends $.Tools.class {
             )(this.scope, ...validNames.map((name:string):any =>
                 this.scope[name])) :
             ''
+        domNode.setAttribute('title', name)
     }
     /**
      * Renders currently defined template parameter into the entry dom node.
@@ -477,7 +478,9 @@ export default class WebsiteBuilder extends $.Tools.class {
                 delete this.scope[name]
         } else
             this.scope[name] = content
-        for (const instance:Array<Object> of this.inPlaceEditorInstances[name])
+        for (
+            const instance:Array<Object> of this.inPlaceEditorInstances[name]
+        ) {
             /*
                 NOTE: An instance tuple consists of a dom node and optionally
                 a running editor instance as second array value. So update
@@ -491,6 +494,8 @@ export default class WebsiteBuilder extends $.Tools.class {
                     instance[1].setContent(content)
             } else if (instance[0].innerHTML !== content)
                 instance[0].innerHTML = content
+            instance[0].setAttribute('title', name)
+        }
         this.populateData(false)
     }
     // endregion
