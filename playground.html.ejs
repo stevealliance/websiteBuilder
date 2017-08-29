@@ -63,14 +63,14 @@
                     Start - ${parameter.number} - advancedContent
                 </div>
             <%%_ } _%%>
-            <angular-application>Angular is loading...</angular-application>
+            <application>Application is loading...</application>
         </div>
         <script src="https://unpkg.com/systemjs@0.19.31/dist/system.js">
         </script>
         <script>
             websiteBuilder.index.$.WebsiteBuilder().then((instance) => {
                 const runTestApplication =
-                    websiteBuilder.angularTestApplication.default
+                    websiteBuilder.testApplication.default
                 window.websiteBuilder = instance
                 instance.registerOnChange((parameterHasChanged) =>
                     parameterHasChanged ? runTestApplication() : null)
