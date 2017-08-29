@@ -24,6 +24,7 @@
   "files": [
     "angular.js",
     "angular.compiled.js",
+    "editorAssets.compiled",
     "index.js",
     "index.css",
     "index.compiled.css"
