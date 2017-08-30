@@ -32,7 +32,7 @@ try {
     module.require('source-map-support/register')
 } catch (error) {}
 // endregion
-// region directives
+// region components
 const attributeNames:Array<string> = [
     'editable', 'initializedEditable',
     'simpleEditable', 'simpleInitializedEditable',
@@ -41,17 +41,12 @@ const attributeNames:Array<string> = [
 let selector:string = ''
 for (const name:string of attributeNames)
     selector += `,[${name}]`
-@Component({
+@Directive({
     inputs: attributeNames,
     selector: selector.substring(1),
-    template: `
-        <input type="hidden" (ngModel)="content" (value)="content.innerHTML" />
-        <ng-container #container><ng-content></ng-content></ng-container>
-    `
 })
 export class EditableDirective {
     activatedRoute:?ActivatedRoute
-    content:string = ''
     contextPath:string = ''
     elementReference:ElementRef
     initialData:?InitialDataService
@@ -107,6 +102,8 @@ export class EditableDirective {
             this.scope = this.initialData.scope
         else if ('scope' in globalContext)
             this.scope = globalContext.scope
+    }
+    ngAfterViewInit():void {
         for (const name:string of attributeNames)
             if (
                 this.hasOwnProperty(name) &&
@@ -118,20 +115,28 @@ export class EditableDirective {
                     'websiteBuilder' in globalContext &&
                     globalContext.websiteBuilder.currentMode !== 'preview'
                 )
+                    // NOTE: This will break in none browser environments.
                     globalContext.websiteBuilder.initializeInPlaceEditor(
-                        name, this[name], this.elementReference.nativeElement)
+                        name, this.contextPath,
+                        this.elementReference.nativeElement)
                 else {
                     let content:string = ''
-                    if (this[name] in this.scope)
-                        content = this.scope[this[name]]
-                    else if (name.toLowerCase().includes('initialized'))
-                        content = this.content
+                    if (this.contextPath in this.scope)
+                        content = this.scope[this.contextPath]
+                    else if (
+                        name.toLowerCase().includes('initialized') &&
+                        this.elementReference.nativeElement &&
+                        'innerHTML' in this.elementReference.nativeElement
+                    )
+                        // NOTE: This could break in none browser environments.
+                        content = this.elementReference.nativeElement.innerHTML
+                            .trim()
                     if (content) {
                         const validNames:Array<string> = Object.keys(
                             this.scope
                         ).filter((name:string):boolean => {
                             try {
-                                new Function(`const ${name}`)()
+                                new Function(`var ${name}`)()
                             } catch (error) {
                                 return false
                             }
@@ -147,9 +152,6 @@ export class EditableDirective {
                     this.renderer.setProperty(
                         this.elementReference.nativeElement, 'innerHTML',
                         content)
-                    this.renderer.setAttribute(
-                        this.elementReference.nativeElement, 'title',
-                        this[name])
                 }
                 break
             }
