@@ -34,8 +34,9 @@ try {
 // endregion
 // region components
 const attributeNames:Array<string> = [
-    'editable', 'initializedEditable',
+    'rawEditable', 'rawInitializedEditable',
     'simpleEditable', 'simpleInitializedEditable',
+    'editable', 'initializedEditable',
     'advancedEditable', 'advancedInitializedEditable'
 ]
 let selector:string = ''

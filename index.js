@@ -32,7 +32,6 @@ import 'tinymce/plugins/advlist'
 import 'tinymce/plugins/autolink'
 import 'tinymce/plugins/lists'
 import 'tinymce/plugins/link'
-import 'tinymce/plugins/image'
 import 'tinymce/plugins/charmap'
 import 'tinymce/plugins/print'
 import 'tinymce/plugins/preview'
@@ -80,8 +79,9 @@ export default class WebsiteBuilder extends $.Tools.class {
         '&#039;': `'`
     }
     static attributeNames:Array<string> = [
-        'editable', 'initializedEditable',
+        'rawEditable', 'rawInitializedEditable',
         'simpleEditable', 'simpleInitializedEditable',
+        'editable', 'initializedEditable',
         'advancedEditable', 'advancedInitializedEditable'
     ]
 
@@ -125,15 +125,56 @@ export default class WebsiteBuilder extends $.Tools.class {
             defaultParameterScope: {},
             entryPointAttributeName: 'root',
             inPlaceEditor: {
-                inline: true,
-                menubar: false,
-                plugins: [
-                    'advlist autolink lists link image charmap print preview anchor',
-                    'searchreplace visualblocks code fullscreen',
-                    'insertdatetime media table contextmenu paste code'
-                ],
-                skin_url: 'editorAssets.compiled/skins/lightgray',
-                toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
+                default: {
+                    /* eslint-disable camelcase */
+                    allow_conditional_comments: false,
+                    allow_script_urls: false,
+                    cache_suffix: `?version=${UTC_BUILD_TIMESTAMP}`,
+                    convert_fonts_to_spans: true,
+                    document_base_url: '/',
+                    element_format: 'xhtml',
+                    entity_encoding: 'raw',
+                    fix_list_elements: true,
+                    forced_root_block: null,
+                    hidden_input: false,
+                    inline: true,
+                    invalid_elements: 'em',
+                    invalid_styles: 'color font-size line-height',
+                    keep_styles: false,
+                    menubar: false,
+                    /* eslint-disable max-len */
+                    plugins: 'fullscreen link code hr nonbreaking searchreplace visualblocks',
+                    /* eslint-enable max-len */
+                    relative_urls: false,
+                    remove_script_host: false,
+                    remove_trailing_brs: true,
+                    schema: 'html5',
+                    skin_url: 'editorAssets.compiled/skins/lightgray',
+                    /* eslint-disable max-len */
+                    toolbar1: 'cut copy paste | undo redo removeformat | styleselect formatselect fontselect fontsizeselect | searchreplace visualblocks fullscreen code',
+                    toolbar2: 'alignleft aligncenter alignright alignjustify outdent indent | link hr nonbreaking bullist numlist bold italic underline strikethrough',
+                    /* eslint-enable max-len */
+                    trim: true
+                    /* eslint-enable camelcase */
+                },
+                raw: {
+                    /* eslint-disable max-len */
+                    toolbar1: 'cut copy paste | undo redo removeformat | code | fullscreen',
+                    /* eslint-enable max-len */
+                    toolbar2: false
+                },
+                simple: {
+                    /* eslint-disable max-len */
+                    toolbar1: 'cut copy paste | undo redo removeformat | bold italic underline strikethrough subscript superscript | fullscreen',
+                    toolbar2: false
+                    /* eslint-enable max-len */
+                },
+                normal: {
+                    /* eslint-disable max-len */
+                    toolbar1: 'cut copy paste | undo redo removeformat | styleselect formatselect | searchreplace visualblocks fullscreen code'
+                    /* eslint-enable max-len */
+                },
+                advanced: {}
             },
             jsonEditor: {
                 /* eslint-disable camelcase */
@@ -297,12 +338,12 @@ export default class WebsiteBuilder extends $.Tools.class {
     initializeDomNode(
         attributeName:string, name:string, domNode:DomNode
     ):void {
-        const useContent:boolean = attributeName.toLowerCase().includes(
-            'initialized')
         if (this.currentMode === 'preview')
-            this.renderDomNode(useContent, name, domNode)
+            this.renderDomNode(
+                attributeName.toLowerCase().includes('initialized'),
+                useContent, name, domNode)
         else
-            this.initializeInPlaceEditor(useContent, name, domNode)
+            this.initializeInPlaceEditor(attributeName, name, domNode)
     }
     /**
      * Initializes all in place editors.
@@ -323,26 +364,28 @@ export default class WebsiteBuilder extends $.Tools.class {
     /**
      * Binds given scope name and dom node to an in place editor instance on
      * click.
-     * @param useContent - Indicates whether current content should be
+     * @param attributeName - Attribute name to determine editor type.
      * considered or attribute name to determine here.
      * @param name - Scope name to bind to.
      * @param domNode - Dom node to bind to.
      * @returns Nothing.
      */
     initializeInPlaceEditor(
-        useContent:boolean, name:string, domNode:DomNode
+        attributeName:boolean, name:string, domNode:DomNode
     ):void {
         const tuple:Array<Object> = [domNode]
         this.registerInPlaceEditor(name, tuple)
-        if (
-            typeof useContent === 'string' &&
-            !useContent.toLowerCase().includes('initialized') ||
-            !useContent
-        )
+        if (!attributeName.toLowerCase().includes('initialized'))
             domNode.innerHTML = ''
+        let type:string = 'normal'
+        if (attributeName.toLowerCase().includes('advanced'))
+            type = 'advanced'
+        else if (attributeName.toLowerCase().includes('simple'))
+            type = 'simple'
         domNode.addEventListener('click', ():void =>
             tinymce.init(this.constructor.extendObject(
-                {}, this._options.inPlaceEditor, {
+                true, {}, this._options.inPlaceEditor.default,
+                this._options.inPlaceEditor[type], {
                     setup: (instance:Object):void => {
                         tuple.push(instance)
                         instance.on('init', ():void => {
