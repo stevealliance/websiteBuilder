@@ -354,8 +354,8 @@ export default class WebsiteBuilder extends $.Tools.class {
     ):void {
         if (this.currentMode === 'preview')
             this.renderDomNode(
-                attributeName.toLowerCase().includes('initialized'),
-                useContent, name, domNode)
+                attributeName.toLowerCase().includes('initialized'), name,
+                domNode)
         else
             this.initializeInPlaceEditor(attributeName, name, domNode)
     }
