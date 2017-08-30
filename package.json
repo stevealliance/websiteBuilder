@@ -52,13 +52,14 @@
     "watch:dll": "webOptimizer build:dll --watch"
   },
   "dependencies": {
+    "angular-tinymce": "^3.1.3",
     "clientnode": "^1.0.234",
     "ejs": "^2.5.7",
     "json-editor": "^0.7.28",
     "tinymce": "^4.6.5"
   },
   "peerDependencies": {
-    "angular-generic": "^1.0.281",
+    "angular-generic": "^1.0.282",
     "@angular/animations": "^4.2.6",
     "@angular/common": "^4.2.6",
     "@angular/compiler": "^4.2.6",
@@ -74,7 +75,7 @@
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
-    "angular-generic": "^1.0.279",
+    "angular-generic": "^1.0.282",
     "@angular/cdk": "^2.0.0-beta.8",
     "@angular/animations": "^4.2.6",
     "@angular/common": "^4.2.6",

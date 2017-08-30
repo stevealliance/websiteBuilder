@@ -18,7 +18,10 @@
     endregion
 */
 // region imports
-import {InitialDataService} from 'angular-generic'
+import {
+    determineDeclarations, determineExports, InitialDataService,
+    TINY_MCE_DEFAULT_OPTIONS
+} from 'angular-generic'
 import {globalContext} from 'clientnode'
 import {
     Directive, ElementRef, Injector, Input, Optional, Renderer2
@@ -28,6 +31,7 @@ import {ActivatedRoute, UrlSegment} from '@angular/router'
 try {
     module.require('source-map-support/register')
 } catch (error) {}
+import {TinyMceComponent, TinyMceModule} from 'angular-tinymce'
 // endregion
 const attributeNames:Array<string> = [
     'editable', 'initializedEditable',
@@ -41,7 +45,7 @@ for (const name:string of attributeNames)
     inputs: attributeNames,
     selector: selector.substring(1)
 })
-export default class Editable {
+export class Editable {
     activatedRoute:?ActivatedRoute
     contextPath:string = ''
     elementReference:ElementRef
@@ -52,7 +56,7 @@ export default class Editable {
     constructor(
         @Optional() activatedRoute:ActivatedRoute, elementReference:ElementRef,
         @Optional() initialData:InitialDataService, injector:Injector,
-        renderer:Renderer2
+        renderer:Renderer2, tinyMCEComponent:TinyMceComponent
     ) {
         this.activatedRoute = activatedRoute
         this.elementReference = elementReference
@@ -143,6 +147,16 @@ export default class Editable {
             }
     }
 }
+// IgnoreTypeCheck
+@NgModule({
+    declarations: determineDeclarations(module),
+    exports: determineExports(module),
+    imports: [TinyMceModule.forRoot(TINY_MCE_DEFAULT_OPTIONS)]
+})
+/**
+ * Represents the importable angular module.
+ */
+export default class Module {}
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
