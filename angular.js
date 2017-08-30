@@ -24,14 +24,13 @@ import {
 } from 'angular-generic'
 import {globalContext} from 'clientnode'
 import {
-    Directive, ElementRef, Injector, Input, Optional, Renderer2
+    Directive, ElementRef, Injector, Input, NgModule, Optional, Renderer2
 } from '@angular/core'
 import {ActivatedRoute, UrlSegment} from '@angular/router'
 // NOTE: Only needed for debugging this file.
 try {
     module.require('source-map-support/register')
 } catch (error) {}
-import {TinyMceComponent, TinyMceModule} from 'angular-tinymce'
 // endregion
 // region directives
 const attributeNames:Array<string> = [
@@ -42,12 +41,17 @@ const attributeNames:Array<string> = [
 let selector:string = ''
 for (const name:string of attributeNames)
     selector += `,[${name}]`
-@Directive({
+@Component({
     inputs: attributeNames,
-    selector: selector.substring(1)
+    selector: selector.substring(1),
+    template: `
+        <input type="hidden" (ngModel)="content" (value)="content.innerHTML" />
+        <ng-container #container><ng-content></ng-content></ng-container>
+    `
 })
-export class Editable {
+export class EditableDirective {
     activatedRoute:?ActivatedRoute
+    content:string = ''
     contextPath:string = ''
     elementReference:ElementRef
     initialData:?InitialDataService
@@ -57,7 +61,7 @@ export class Editable {
     constructor(
         @Optional() activatedRoute:ActivatedRoute, elementReference:ElementRef,
         @Optional() initialData:InitialDataService, injector:Injector,
-        renderer:Renderer2, tinyMCEComponent:TinyMceComponent
+        renderer:Renderer2
     ) {
         this.activatedRoute = activatedRoute
         this.elementReference = elementReference
@@ -110,40 +114,43 @@ export class Editable {
                 this[name]
             ) {
                 this.contextPath += `:${this[name]}`
-                if (!name.toLowerCase().includes('initialized'))
+                if (
+                    'websiteBuilder' in globalContext &&
+                    globalContext.websiteBuilder.currentMode !== 'preview'
+                )
+                    globalContext.websiteBuilder.initializeInPlaceEditor(
+                        name, this[name], this.elementReference.nativeElement)
+                else {
+                    let content:string = ''
+                    if (this[name] in this.scope)
+                        content = this.scope[this[name]]
+                    else if (name.toLowerCase().includes('initialized'))
+                        content = this.content
+                    if (content) {
+                        const validNames:Array<string> = Object.keys(
+                            this.scope
+                        ).filter((name:string):boolean => {
+                            try {
+                                new Function(`const ${name}`)()
+                            } catch (error) {
+                                return false
+                            }
+                            return true
+                        })
+                        // IgnoreTypeCheck
+                        content = new Function(
+                            'scope', ...validNames, `return \`${content}\``
+                        )(this.scope, ...validNames.map((name:string):any =>
+                            this.scope[name]))
+                    } else
+                        content = ''
                     this.renderer.setProperty(
-                        this.elementReference.nativeElement, 'innerHTML', '')
-                if ('websiteBuilder' in globalContext) {
-                    if (
-                        globalContext.websiteBuilder.currentMode === 'preview'
-                    ) {
-                        globalContext.websiteBuilder.renderDomNode(
-                            this.contextPath,
-                            this.elementReference.nativeElement)
-                        break
-                    }
-                    const tuple:Array<Object> = [
-                        this.elementReference.nativeElement]
-                    // TODO use tinymce
-                    this.renderer.setAttribute(
-                        this.elementReference.nativeElement,
-                        'contenteditable', '')
-                    globalContext.websiteBuilder.registerInPlaceEditor(
-                        this.contextPath, tuple)
-                    globalContext.websiteBuilder.updateModel(
-                        this.contextPath, this.elementReference.nativeElement,
-                        true)
-                    // TODO
-                    this.renderer.listen(
-                        this.elementReference.nativeElement, 'input', (
-                            event:Object
-                        ):void => globalContext.websiteBuilder.updateModel(
-                            this.contextPath,
-                            this.elementReference.nativeElement))
-                } else if (this[name] in this.scope)
-                    this.renderer(
                         this.elementReference.nativeElement, 'innerHTML',
-                        this.scope[this[name]])
+                        content)
+                    this.renderer.setAttribute(
+                        this.elementReference.nativeElement, 'title',
+                        this[name])
+                }
                 break
             }
     }
@@ -154,7 +161,6 @@ export class Editable {
 @NgModule({
     declarations: determineDeclarations(module),
     exports: determineExports(module),
-    imports: [TinyMceModule.forRoot(TINY_MCE_DEFAULT_OPTIONS)],
     providers: determineProviders(module)
 })
 /**

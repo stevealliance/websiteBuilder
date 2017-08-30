@@ -287,10 +287,26 @@ export default class WebsiteBuilder extends $.Tools.class {
         return this
     }
     /**
+     * Binds given scope name and dom node to an in place editor instance on
+     * click.
+     * @param attributeName - Name if indicating directive.
+     * @param name - Scope name to bind to.
+     * @param domNode - Dom node to bind to.
+     * @returns Nothing.
+     */
+    initializeDomNode(
+        attributeName:string, name:string, domNode:DomNode
+    ):void {
+        if (this.currentMode === 'preview')
+            this.renderDomNode(name, domNode)
+        else
+            this.initializeInPlaceEditor(attributeName, name, domNode)
+    }
+    /**
      * Initializes all in place editors.
      * @returns Nothing.
      */
-    initializeInPlaceEditor():void {
+    initializeDomNodes():void {
         this.inPlaceEditorInstances = {}
         for (const attributeName:string of WebsiteBuilder.attributeNames)
             for (const domNode:DomNode of this.domNode.querySelectorAll(
@@ -299,46 +315,59 @@ export default class WebsiteBuilder extends $.Tools.class {
                 const name:string = domNode.getAttribute(attributeName)
                 if (!name)
                     continue
-                const tuple:Array<Object> = [domNode]
-                this.registerInPlaceEditor(name, tuple)
-                if (!attributeName.toLowerCase().includes('initialized'))
-                    domNode.innerHTML = ''
-                domNode.addEventListener('click', ():void =>
-                    tinymce.init(this.constructor.extendObject(
-                        {}, this._options.inPlaceEditor, {
-                            setup: (instance:Object):void => {
-                                tuple.push(instance)
-                                instance.on('init', ():void => {
-                                    instance.focus()
-                                    this._inPlaceEditorBackgroundColorFix()
-                                })
-                                instance.on('focus', ():void => {
-                                    const className:string = this._options
-                                        .className.selectedEditorIndicator
-                                    const lastSelectedDomNode:DomNode =
-                                        this.domNode.querySelector(
-                                            `.${className}`)
-                                    if (lastSelectedDomNode)
-                                        lastSelectedDomNode.classList.remove(
-                                            className)
-                                    domNode.classList.add(className)
-                                })
-                                instance.on('blur', domNode.blur.bind(domNode))
-                                // Update model on changes
-                                instance.on('ExecCommand', ():void =>
-                                    this.updateModel(name, instance))
-                                for (const eventName:string of [
-                                    'change', 'ObjectResized'
-                                ])
-                                    instance.on(eventName, ():void => {
-                                        instance.save()
-                                        this.updateModel(name, instance)
-                                    })
-                            },
-                            target: domNode
-                        })))
-                this.updateModel(name, domNode, true)
+                this.initializeDomNode(attributeName, name, domNode)
             }
+    }
+    /**
+     * Binds given scope name and dom node to an in place editor instance on
+     * click.
+     * @param attributeName - Name if indicating directive.
+     * @param name - Scope name to bind to.
+     * @param domNode - Dom node to bind to.
+     * @returns Nothing.
+     */
+    initializeInPlaceEditor(
+        attributeName:string, name:string, domNode:DomNode
+    ):void {
+        const tuple:Array<Object> = [domNode]
+        this.registerInPlaceEditor(name, tuple)
+        if (!attributeName.toLowerCase().includes('initialized'))
+            domNode.innerHTML = ''
+        domNode.addEventListener('click', ():void =>
+            tinymce.init(this.constructor.extendObject(
+                {}, this._options.inPlaceEditor, {
+                    setup: (instance:Object):void => {
+                        tuple.push(instance)
+                        instance.on('init', ():void => {
+                            instance.focus()
+                            this._inPlaceEditorBackgroundColorFix()
+                        })
+                        instance.on('focus', ():void => {
+                            const className:string = this._options
+                                .className.selectedEditorIndicator
+                            const lastSelectedDomNode:DomNode =
+                                this.domNode.querySelector(
+                                    `.${className}`)
+                            if (lastSelectedDomNode)
+                                lastSelectedDomNode.classList.remove(
+                                    className)
+                            domNode.classList.add(className)
+                        })
+                        instance.on('blur', domNode.blur.bind(domNode))
+                        // Update model on changes
+                        instance.on('ExecCommand', ():void =>
+                            this.updateModel(name, instance))
+                        for (const eventName:string of [
+                            'change', 'ObjectResized'
+                        ])
+                            instance.on(eventName, ():void => {
+                                instance.save()
+                                this.updateModel(name, instance)
+                            })
+                    },
+                    target: domNode
+                })))
+        this.updateModel(name, domNode, true)
     }
     /**
      * Provides current data via post message to parent context.
@@ -353,7 +382,6 @@ export default class WebsiteBuilder extends $.Tools.class {
                 this.domNode)
         console.log('TODO Send data: ', this.scope)
     }
-
     /**
      * Registers given in place editor to synchronize scope values with.
      * @param name - Scope name given editor is bound to.
@@ -383,21 +411,29 @@ export default class WebsiteBuilder extends $.Tools.class {
         }
     }
     /**
-     * Renders current scope values into the entry dom nodes content.
-     * @returns Nothing.
+     * Renders given content again current scope.
+     * @param content - String to render.
+     * @returns Rendered string.
      */
-    render():void {
-        for (const attributeName:string of WebsiteBuilder.attributeNames)
-            for (const domNode:DomNode of this.domNode.querySelectorAll(
-                `[${attributeName}]`
-            )) {
-                const name:string = domNode.getAttribute(attributeName)
-                if (!name)
-                    continue
-                if (!attributeName.toLowerCase().includes('initialized'))
-                    domNode.innerHTML = ''
-                this.renderDomNode(name, domNode)
-            }
+    render(content:string):string {
+        if (content) {
+            const validNames:Array<string> = Object.keys(this.scope).filter((
+                name:string
+            ):boolean => {
+                try {
+                    new Function(`const ${name}`)()
+                } catch (error) {
+                    return false
+                }
+                return true
+            })
+            // IgnoreTypeCheck
+            return new Function(
+                'scope', ...validNames, `return \`${content}\``
+            )(this.scope, ...validNames.map((name:string):any =>
+                this.scope[name]))
+        }
+        return ''
     }
     /**
      * Renders current scope value for given name into given dom node.
@@ -406,19 +442,9 @@ export default class WebsiteBuilder extends $.Tools.class {
      * @returns Nothing.
      */
     renderDomNode(name:string, domNode:DomNode):void {
-        const content:string =
+        domNode.innerHTML = this.render(
             this.scope.hasOwnProperty(name) ? this.scope[name] :
-            domNode.innerHTML
-        const validNames:Array<string> =
-            Object.keys(this.scope).filter((name:string):boolean =>
-                /^[a-zA-Z_]+$/.test(name))
-        // IgnoreTypeCheck
-        domNode.innerHTML =
-            content ? new Function(
-                'scope', ...validNames, `return \`${content}\``
-            )(this.scope, ...validNames.map((name:string):any =>
-                this.scope[name])) :
-            ''
+            domNode.innerHTML)
         domNode.setAttribute('title', name)
     }
     /**
@@ -452,10 +478,7 @@ export default class WebsiteBuilder extends $.Tools.class {
             this.domNode.classList.remove(name)
         this.domNode.classList.add(this.currentMode)
         this.renderParameter()
-        if (this.currentMode === 'preview')
-            this.render()
-        else
-            this.initializeInPlaceEditor()
+        this.initializeDomNodes()
         this.populateData()
     }
     /**

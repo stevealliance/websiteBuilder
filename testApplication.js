@@ -23,7 +23,7 @@ import {Component, enableProdMode, NgModule, VERSION} from '@angular/core'
 import {BrowserModule} from '@angular/platform-browser'
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic'
 import {Router, RouterModule} from '@angular/router'
-import Editable from './angular'
+import EditableModule from './angular'
 // endregion
 @Component({
     selector: 'a',
@@ -60,13 +60,13 @@ export default ():void => {
     @NgModule({
         bootstrap: [Application],
         declarations: [
-            Application,
             A,
-            B,
-            Editable
+            Application,
+            B
         ],
         imports: [
             BrowserModule,
+            EditableModule,
             GenericModule,
             RouterModule.forRoot(
                 [

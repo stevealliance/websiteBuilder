@@ -52,7 +52,6 @@
     "watch:dll": "webOptimizer build:dll --watch"
   },
   "dependencies": {
-    "angular-tinymce": "^3.1.3",
     "clientnode": "^1.0.234",
     "ejs": "^2.5.7",
     "json-editor": "^0.7.28",
