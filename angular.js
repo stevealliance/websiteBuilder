@@ -19,8 +19,8 @@
 */
 // region imports
 import {
-    determineDeclarations, determineExports, InitialDataService,
-    TINY_MCE_DEFAULT_OPTIONS
+    determineDeclarations, determineExports, determineProviders,
+    InitialDataService, TINY_MCE_DEFAULT_OPTIONS
 } from 'angular-generic'
 import {globalContext} from 'clientnode'
 import {
@@ -33,6 +33,7 @@ try {
 } catch (error) {}
 import {TinyMceComponent, TinyMceModule} from 'angular-tinymce'
 // endregion
+// region directives
 const attributeNames:Array<string> = [
     'editable', 'initializedEditable',
     'simpleEditable', 'simpleInitializedEditable',
@@ -147,16 +148,20 @@ export class Editable {
             }
     }
 }
+// endregion
+// region module
 // IgnoreTypeCheck
 @NgModule({
     declarations: determineDeclarations(module),
     exports: determineExports(module),
-    imports: [TinyMceModule.forRoot(TINY_MCE_DEFAULT_OPTIONS)]
+    imports: [TinyMceModule.forRoot(TINY_MCE_DEFAULT_OPTIONS)],
+    providers: determineProviders(module)
 })
 /**
  * Represents the importable angular module.
  */
 export default class Module {}
+// endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
