@@ -17,6 +17,7 @@
     See http://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
+// TODO Button to restore template default values.
 // region imports
 import {$ as binding} from 'clientnode'
 import type {DomNode, PlainObject} from 'clientnode'
