@@ -52,7 +52,7 @@
     "watch:dll": "webOptimizer build:dll --watch"
   },
   "dependencies": {
-    "clientnode": "^1.0.234",
+    "clientnode": "^1.0.237",
     "ejs": "^2.5.7",
     "json-editor": "^0.7.28",
     "tinymce": "^4.6.5"

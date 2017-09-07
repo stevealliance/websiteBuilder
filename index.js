@@ -572,7 +572,9 @@ export default class WebsiteBuilder extends $.Tools.class {
                 content = this.scope[name]
         }
         let inSyncWithTemplate:boolean = false
-        if (this.initialScope[name] === content) {
+        if (this.constructor.isEquivalentDOM(
+            this.initialScope[name], content
+        )) {
             if (name in this.scope)
                 delete this.scope[name]
             inSyncWithTemplate = true
