@@ -224,6 +224,71 @@ export default class WebsiteBuilder extends $.Tools.class {
                         },
                         name: 'preview',
                         states: ['hybrid', 'preview', 'helper']
+                    },
+                    {
+                        action: (state:string):void => {
+                            console.log('TODO synchronize all')
+                        },
+                        label: {
+                            dirty: 'Synchronize all',
+                            synchronized: ''
+                        },
+                        name: 'synchronizeAll',
+                        states: ['synchronized', 'dirty']
+                    },
+                    {
+                        action: (state:string):void => {
+                            console.log('TODO synchronize current')
+                        },
+                        label: {
+                            dirty: 'Synchronize',
+                            synchronized: ''
+                        },
+                        name: 'synchronizeSelected',
+                        states: ['synchronized', 'dirty']
+                    },
+                    {
+                        action: (state:string):void => {
+                            console.log('TODO clear all')
+                        },
+                        label: {
+                            cleared: '',
+                            filled: 'clear'
+                        },
+                        name: 'clear',
+                        states: ['filled', 'cleared']
+                    },
+                    {
+                        action: (state:string):void => {
+                            console.log('TODO reset all')
+                        },
+                        label: {
+                            changed: 'reset',
+                            unchanged: ''
+                        },
+                        name: 'reset',
+                        states: ['unchanged', 'change']
+                    },
+                    {
+                        action: (state:string):void => {
+                            for (
+                                const buttonDomNode:DomNode of
+                                this.domNodes.toolbar.querySelectorAll(
+                                    'button')
+                            )
+                                if (
+                                    buttonDomNode !==
+                                    this.domNodes.toggleToolbar
+                                )
+                                    buttonDomNode.style.display =
+                                        state === 'show' ? 'none' : 'initial'
+                        },
+                        label: {
+                            hide: 'Show toolbar',
+                            show: 'Hide toolbar'
+                        },
+                        name: 'toggleToolbar',
+                        states: ['hide', 'show']
                     }
                 ],
                 divs: [
