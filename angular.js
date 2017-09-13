@@ -19,12 +19,21 @@
 */
 // region imports
 import {
-    determineDeclarations, determineExports, determineProviders,
-    InitialDataService, TINY_MCE_DEFAULT_OPTIONS
+    determineDeclarations,
+    determineExports,
+    determineProviders,
+    InitialDataService,
+    TINY_MCE_DEFAULT_OPTIONS
 } from 'angular-generic'
 import {globalContext} from 'clientnode'
 import {
-    Directive, ElementRef, Injector, Input, NgModule, Optional, Renderer2
+    Directive,
+    ElementRef,
+    Injector,
+    Input,
+    NgModule,
+    Optional,
+    Renderer2
 } from '@angular/core'
 import {ActivatedRoute, UrlSegment} from '@angular/router'
 // NOTE: Only needed for debugging this file.
