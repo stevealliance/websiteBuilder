@@ -52,7 +52,7 @@
     "watch:dll": "webOptimizer build:dll --watch"
   },
   "dependencies": {
-    "clientnode": "^1.0.237",
+    "clientnode": "^1.0.240",
     "ejs": "^2.5.7",
     "json-editor": "^0.7.28",
     "tinymce": "^4.6.5"
@@ -101,7 +101,7 @@
     "rxjs": "^5.4.2",
     "source-map-support": "^0.4.15",
     "stylelint": "^7.13.0",
-    "weboptimizer": "^1.0.360",
+    "weboptimizer": "^1.0.368",
     "webpack": "^3.2.0",
     "webpack-dev-server": "^2.5.1",
     "zone.js": "^0.8.14"
@@ -145,7 +145,7 @@
         "clientnode/test$": "clientnode/test.compiled"
       },
       "optimizer": {
-        "babili": null,
+        "babelMinify": null,
         "data": {
           "exclude": "true"
         },
