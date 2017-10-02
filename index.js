@@ -71,8 +71,11 @@ import './index.css'
 export const $:any = binding
 // region plugins/classes
 /**
+ * @property static:attributeNames - Attribute names to take into account.
  * @property static:escapedMarkupSymbolMapping - Symbol sequence mapping to
  * convert escaped markup.
+ * @property static:schema - Schema to specify scope.
+ * @property static:scope -  Initial scope values.
  *
  * @property currentMode - Current editing mode.
  * @property domNodes - Reference to all needed control dom nodes.
@@ -86,6 +89,12 @@ export const $:any = binding
  */
 export default class WebsiteBuilder extends $.Tools.class {
     // region properties
+    static attributeNames:Array<string> = [
+        'rawEditable', 'rawInitializedEditable',
+        'simpleEditable', 'simpleInitializedEditable',
+        'editable', 'initializedEditable',
+        'advancedEditable', 'advancedInitializedEditable'
+    ]
     static escapedMarkupSymbolMapping:{[key:string]:string} = {
         '&amp;': '&',
         '&lt;': '<',
@@ -93,12 +102,8 @@ export default class WebsiteBuilder extends $.Tools.class {
         '&quot;': '"',
         '&#039;': `'`
     }
-    static attributeNames:Array<string> = [
-        'rawEditable', 'rawInitializedEditable',
-        'simpleEditable', 'simpleInitializedEditable',
-        'editable', 'initializedEditable',
-        'advancedEditable', 'advancedInitializedEditable'
-    ]
+    static schema:?PlainObject
+    static scope:?PlainObject
 
     currentMode:string = 'hybrid'
     domNodes:{[key:string]:DomNode} = {}
@@ -325,7 +330,11 @@ export default class WebsiteBuilder extends $.Tools.class {
         }
         super.initialize(options)
         if (!this._options.schema)
+            this._options.schema = this.constructor.schema
+        if (!this._options.schema)
             this._options.schema = $.global[this._options.schemaName] || {}
+        if (!this._options.scope)
+            this._options.scope = this.constructor.scope
         if (!this._options.scope)
             this._options.scope = $.global[this._options.scopeName] || {}
         this.scope = this._options.scope
