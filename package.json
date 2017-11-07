@@ -127,7 +127,7 @@
           "__evaluate__": "self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'build' ? [] : './testApplication'"
         },
         "vendor": {
-          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['build:dll', 'serve', 'test:browser', 'watch:dll'].includes(self.givenCommandLineArguments[2]) ? ['babel-polyfill', 'clientnode', 'hammerjs', 'reflect-metadata', 'zone.js', 'rxjs', '@angular/animations', '@angular/common', '@angular/core', '@angular/http', '@angular/material', '@angular/platform-browser', '@angular/platform-browser-dynamic', '@angular/router', 'angular-generic'].concat(self.givenCommandLineArguments[2] === 'serve' ? [] : ['script!qunitjs', 'weboptimizer/browserAPI']) : []"
+          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['build:dll', 'serve', 'test:browser', 'watch:dll'].includes(self.givenCommandLineArguments[2]) ? ['babel-polyfill', 'clientnode', 'hammerjs', 'reflect-metadata', 'zone.js', 'rxjs', '@angular/animations', '@angular/common', '@angular/core', '@angular/http', '@angular/material', '@angular/platform-browser', '@angular/platform-browser-dynamic', '@angular/router', 'angular-generic'].concat(self.givenCommandLineArguments[2] === 'serve' ? [] : ['script!qunit', 'weboptimizer/browserAPI']) : []"
         }
       }
     },
