@@ -178,7 +178,8 @@ export class EditableDirective {
 /**
  * Represents the importable angular module.
  */
-export default class Module {}
+export class Module {}
+export default Module
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

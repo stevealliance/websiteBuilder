@@ -87,7 +87,7 @@ export const $:any = binding
  * changes.
  * @property template - Determined template to render parameter into.
  */
-export default class WebsiteBuilder extends $.Tools.class {
+export class WebsiteBuilder extends $.Tools.class {
     // region properties
     static attributeNames:Array<string> = [
         'rawEditable', 'rawInitializedEditable',
@@ -719,6 +719,7 @@ export default class WebsiteBuilder extends $.Tools.class {
     }
     // endregion
 }
+export default WebsiteBuilder
 // endregion
 $.WebsiteBuilder = (...parameter:Array<any>):Promise<DomNode> =>
     $.Tools().controller(WebsiteBuilder, parameter)
