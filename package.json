@@ -84,7 +84,7 @@
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-polyfill": "^6.23.0",
     "clientnode": "^1.0.290",
-    "documentation-website": "^1.0.78",
+    "documentation-website": "^1.0.79",
     "ejs": "^2.5.7",
     "eslint": "^4.11.0",
     "eslint-config-google": "^0.9.1",
