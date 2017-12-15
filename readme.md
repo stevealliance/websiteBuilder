@@ -13,6 +13,14 @@ endregion -->
 
 [![Build Status](https://travis-ci.org/thaibault/websiteBuilder.svg?branch=master)](https://travis-ci.org/thaibault/websiteBuilder)
 
+[![npm version](https://badge.fury.io/js/website-builder.svg)](https://www.npmjs.com/package/website-builder)
+[![downloads](https://img.shields.io/npm/dy/website-builder.svg)](https://www.npmjs.com/package/website-builder)
+[![build status](https://travis-ci.org/thaibault/websiteBuilder.svg?branch=master)](https://travis-ci.org/thaibault/websiteBuilder)
+[![dependencies](https://img.shields.io/david/thaibault/website-builder.svg)](https://david-dm.org/thaibault/website-builder)
+[![devDependencies](https://img.shields.io/david/dev/thaibault/website-builder.svg)](https://david-dm.org/thaibault/website-builder=dev)
+[![peerDependencies](https://img.shields.io/david/peer/thaibault/website-builder.svg)](https://david-dm.org/thaibault/website-builder?type=peer)
+[![documentation-website](https://img.shields.io/website-up-down-green-red/http/torben.website/websiteBuilder.svg?label=documentation-website)](http://torben.website/websiteBuilder)
+
 <!--|deDE:Einsatzmöglichkeiten-->
 Use cases
 ---------
