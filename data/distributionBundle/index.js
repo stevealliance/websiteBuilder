@@ -20,12 +20,12 @@
 // TODO Button to restore template default values.
 // region imports
 import {$ as binding} from 'clientnode'
-import type {DomNode, PlainObject} from 'clientnode'
+import {DomNode, PlainObject} from 'clientnode'
 import ejs from 'ejs'
 import JSONEditor from 'exports?JSONEditor!json-editor'
 // NOTE: Only needed for debugging this file.
 try {
-    module.require('source-map-support/register')
+    eval('require')('source-map-support/register')
 } catch (error) {}
 import tinymce from 'tinymce'
 import 'tinymce/plugins/anchor'

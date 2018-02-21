@@ -1,26 +1,2 @@
 /* !/usr/bin/env css
--*- coding: utf-8 -*- */
-/* region header
-Copyright Torben Sickert 16.12.2012
-
-License
--------
-
-This library written by Torben Sickert stand under a creative commons naming
-3.0 unported license. see http://creativecommons.org/licenses/by/3.0/deed.de
-endregion */
-[root].helper [editable],
-    [root].helper [initializedEditable],
-    [root].helper [simpleEditable],
-    [root].helper [simpleInitializedEditable],
-    [root].helper [advancedEditable],
-    [root].helper [advancedInitializedEditable] {
-    border: 1px dashed grey;
-}
-[root].helper [editable].synchronized, [root].helper [initializedEditable].synchronized, [root].helper [simpleEditable].synchronized, [root].helper [simpleInitializedEditable].synchronized, [root].helper [advancedEditable].synchronized, [root].helper [advancedInitializedEditable].synchronized {
-    border-color: green;
-}
-/* region vim modline
-vim: set tabstop=4 shiftwidth=4 expandtab:
-vim: foldmethod=marker foldmarker=region,endregion:
-endregion */
+-*- coding: utf-8 -*- */[root].helper [advancedEditable],[root].helper [advancedInitializedEditable],[root].helper [editable],[root].helper [initializedEditable],[root].helper [simpleEditable],[root].helper [simpleInitializedEditable]{border:1px dashed grey}[root].helper [advancedEditable].synchronized,[root].helper [advancedInitializedEditable].synchronized,[root].helper [editable].synchronized,[root].helper [initializedEditable].synchronized,[root].helper [simpleEditable].synchronized,[root].helper [simpleInitializedEditable].synchronized{border-color:green}
