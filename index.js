@@ -23,10 +23,6 @@ import {$ as binding} from 'clientnode'
 import {DomNode, PlainObject} from 'clientnode'
 import ejs from 'ejs'
 import JSONEditor from 'exports?JSONEditor!json-editor'
-// NOTE: Only needed for debugging this file.
-try {
-    eval('require')('source-map-support/register')
-} catch (error) {}
 import tinymce from 'tinymce'
 import 'tinymce/plugins/anchor'
 import 'tinymce/plugins/advlist'
