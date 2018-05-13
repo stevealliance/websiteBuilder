@@ -101,6 +101,7 @@
     "eslint-plugin-flowtype": "^2.46.3",
     "eslint-plugin-jsdoc": "^3.6.3",
     "flow-bin": "*",
+    "jquery": "^3.3.1",
     "jsdoc": "^3.5.2",
     "json-editor": "^0.7.28",
     "nyc": "^11.7.1",
@@ -205,12 +206,23 @@
       "replacements": {
         "context": [
           [
-            "/@angular\\/+core\\/+esm(?:201)?5/",
+            "/@angular\\/+core\\/+f?esm(?:201)?5/",
             {
               "__evaluate__": "`'${self.path.source.base}'`"
             }
           ]
-        ]
+        ],
+        "normal": {
+          "^angular-tinymce$": "angular-tinymce/bundles/angular-tinymce.umd.min.js",
+          "^babel-polyfill$": "babel-polyfill/dist/polyfill.min.js",
+          "^blob-util$": "blob-util/dist/blob-util.min.js",
+          "^hammerjs$": "hammerjs/hammer.min.js",
+          "^jquery$": {
+            "__evaluate__": "path.resolve('./node_modules/jquery/dist/jquery.min.js')"
+          },
+          "^pouchdb(?:/.+)?$": "pouchdb/dist/pouchdb.min.js",
+          "^pouchdb-promise(?:/.+)?$": "pouchdb-promise/lib/index.js"
+        }
       },
       "skipParseRegularExpressions": {
         "__evaluate__": "/(?:^|\\/)(?:(?:babel-polyfill\\/dist\\/polyfill)|(?:webpack\\/buildin\\/global)|(?:webpack\\/buildin\\/module))(?:\\.min)?\\.js(?:\\?.+|$)/"
