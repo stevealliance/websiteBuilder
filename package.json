@@ -1,6 +1,6 @@
 {
   "name": "website-builder",
-  "version": "1.0.141",
+  "version": "1.0.142",
   "license": "CC-BY-3.0",
   "description": "edit data for a templates",
   "homepage": "http://torben.website/websiteBuilder",
@@ -58,7 +58,6 @@
     "watch:dll": "webOptimizer build:dll --watch"
   },
   "peerDependencies": {
-    "angular-generic": "*",
     "@angular/animations": "*",
     "@angular/common": "*",
     "@angular/compiler": "*",
@@ -69,6 +68,7 @@
     "@angular/platform-browser": "*",
     "@angular/platform-browser-dynamic": "*",
     "@angular/router": "*",
+    "angular-generic": "*",
     "reflect-metadata": "*",
     "rxjs": "*",
     "zone.js": "*"
@@ -94,8 +94,8 @@
     "babel-polyfill": "^6.26.0",
     "clientnode": "^3.0.87",
     "coveralls": "^3.0.2",
-    "cssnano": "^4.0.5",
     "css-loader": "^1.0.0",
+    "cssnano": "^4.0.5",
     "documentation-website": "^1.0.138",
     "ejs": "^2.6.1",
     "eslint": "^5.4.0",
@@ -118,8 +118,8 @@
     "qunit": "^2.6.2",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.2.2",
-    "stylelint": "^9.5.0",
     "style-loader": "^0.22.1",
+    "stylelint": "^9.5.0",
     "stylelint-config-standard": "^18.2.0",
     "tinymce": "^4.8.2",
     "typescript": "2.9.x",
