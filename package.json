@@ -209,7 +209,7 @@
             "plugins": {
               "__prepend__": [
                 "angular2-annotations",
-                "@babel/plugin-proposal-decorators"
+                ["@babel/plugin-proposal-decorators", {"legacy": true}]
               ],
               "__remove__": "@babel/plugin-transform-runtime"
             }
