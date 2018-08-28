@@ -1,6 +1,6 @@
 {
   "name": "website-builder",
-  "version": "1.0.143",
+  "version": "1.0.144",
   "license": "CC-BY-3.0",
   "description": "edit data for a templates",
   "homepage": "https://torben.website/websiteBuilder",
@@ -209,7 +209,12 @@
             "plugins": {
               "__prepend__": [
                 "angular2-annotations",
-                ["@babel/plugin-proposal-decorators", {"legacy": true}]
+                [
+                  "@babel/plugin-proposal-decorators",
+                  {
+                    "legacy": true
+                  }
+                ]
               ],
               "__remove__": "@babel/plugin-transform-runtime"
             }
