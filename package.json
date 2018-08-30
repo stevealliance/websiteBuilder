@@ -91,7 +91,7 @@
     "@types/node": "*",
     "angular-generic": "*",
     "babel-eslint": "*",
-    "babel-plugin-angular2-annotations": "^5.1.0",
+    "babel-plugin-angular2-annotations": "*",
     "clientnode": "*",
     "coveralls": "*",
     "css-loader": "*",
