@@ -1,6 +1,6 @@
 {
   "name": "website-builder",
-  "version": "1.0.146",
+  "version": "1.0.147",
   "license": "CC-BY-3.0",
   "description": "edit data for a templates",
   "homepage": "https://torben.website/websiteBuilder",
@@ -221,7 +221,6 @@
                     "loose": true
                   }
                 ]
-
               ],
               "__remove__": [
                 "@babel/plugin-proposal-class-properties",
