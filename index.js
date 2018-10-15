@@ -322,7 +322,7 @@ export class WebsiteBuilder extends $.Tools.class {
             schemaName: 'schema',
             scope: null,
             scopeName: 'scope',
-            waitForDocumentReady: true,
+            waitForDocumentReady: true
         }
         super.initialize(options)
         if (!this._options.schema)
@@ -450,7 +450,6 @@ export class WebsiteBuilder extends $.Tools.class {
      * Binds given scope name and dom node to an in place editor instance on
      * click.
      * @param attributeName - Attribute name to determine editor type.
-     * considered or attribute name to determine here.
      * @param name - Scope name to bind to.
      * @param domNode - Dom node to bind to.
      * @returns Nothing.
@@ -523,7 +522,7 @@ export class WebsiteBuilder extends $.Tools.class {
      * @param tuple - Of dom node and in-place editor instance.
      * @returns Nothing.
      */
-    registerInPlaceEditor(name, tuple:Array<Object>):void {
+    registerInPlaceEditor(name:string, tuple:Array<Object>):void {
         if (this.inPlaceEditorInstances.hasOwnProperty(name))
             this.inPlaceEditorInstances[name].push(tuple)
         else
@@ -634,8 +633,8 @@ export class WebsiteBuilder extends $.Tools.class {
     ):void {
         let content = this.transformContent(
             'getContent' in givenInstance ?
-            givenInstance.getContent() :
-            givenInstance.innerHTML)
+                givenInstance.getContent() :
+                givenInstance.innerHTML)
         if (initialize) {
             this.initialScope[name] = content
             if (name in this.scope)
