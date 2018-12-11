@@ -778,6 +778,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.12.tgz#e15a9d034d9210f00320ef718a50c4a799417c47"
   integrity sha512-Pr+6JRiKkfsFvmU/LK68oBRCQeEg36TyAbPhc2xpez24OOZZCuoIhWGTd39VZy6nGafSbxzGouFPTFD/rR1A0A==
 
+"@types/q@^1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.1.tgz#48fd98c1561fe718b61733daed46ff115b496e18"
+  integrity sha512-eqz8c/0kwNi/OEHQfvIuJVLTst3in0e7uTKeuY+WL/zfKn0xVujOTp42bS/vUUokhK5P2BppLd9JXMOMHcgbjA==
+
 "@webassemblyjs/ast@1.7.11":
   version "1.7.11"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.7.11.tgz#b988582cafbb2b095e8b556526f30c90d057cace"
@@ -1054,9 +1059,9 @@ amdefine@>=0.0.4:
   integrity sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=
 
 angular-generic@*:
-  version "1.0.720"
-  resolved "https://registry.yarnpkg.com/angular-generic/-/angular-generic-1.0.720.tgz#e42aff785983d24ab42711abc96f55d6225c6386"
-  integrity sha512-RPIcO0S7pwkRDtF18HOJddUd+BSMysTKYlxiUqakmm6bgGDrC0wq2MmTT34cHuT0pJRSHoliBAULu5vHFGyHhg==
+  version "1.0.723"
+  resolved "https://registry.yarnpkg.com/angular-generic/-/angular-generic-1.0.723.tgz#e22268a80862336f7b805f7a7f47d8ee265b46b7"
+  integrity sha512-zPA7ls0CJZOnvoycnXKq348ltEaRLWzb5wUgtxzjk3QNuURQb+5UlpDy2+kDKvsas36zM5LgwTLr/4hQSnKugw==
   dependencies:
     blob-util "*"
     clientnode "*"
@@ -2568,9 +2573,9 @@ cli-width@^2.0.0:
   integrity sha1-/xnt6Kml5XkyQUewwR8PvLq+1jk=
 
 clientnode@*:
-  version "3.0.178"
-  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.178.tgz#0c12ed2b782b4d31f297eb2b0ee460a103cb8046"
-  integrity sha512-jpOact93/MGlf4Fyi2nr1oUmiQJNjPWbiGXbPOgJs2pLAMqDqSBjZaoegSyKwtUG4Tvs54mtBFo5qfrhoenHjA==
+  version "3.0.180"
+  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.180.tgz#c60a4e1edb55cfa3db4bb65a4b322a884394d5a5"
+  integrity sha512-FkmqtYbyoyWKp5fUPyw64k49cGrZRd/6Z5quUw8kqfB1z7uOBkY5XCQhnW0bRHatMIOwRgPcAY8rxa4Htqa7QQ==
   dependencies:
     colors "*"
 
@@ -2649,10 +2654,12 @@ co@^4.6.0:
   integrity sha1-bqa989hTrlTMuOR7+gvz+QMfsYQ=
 
 coa@~2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/coa/-/coa-2.0.1.tgz#f3f8b0b15073e35d70263fb1042cb2c023db38af"
-  integrity sha512-5wfTTO8E2/ja4jFSxePXlG5nRu5bBtL/r1HCIpJW/lzT6yDtKl0u0Z4o/Vpz32IpKmBn7HerheEZQgA9N2DarQ==
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/coa/-/coa-2.0.2.tgz#43f6c21151b4ef2bf57187db0d73de229e3e7ec3"
+  integrity sha512-q5/jG+YQnSy4nRTV4F7lPepBJZ8qBNJJDBuJdoejDyLXgmL7IEo+Le2JDZudFTFt7mrCqIRaSjws4ygRCTCAXA==
   dependencies:
+    "@types/q" "^1.5.1"
+    chalk "^2.4.1"
     q "^1.1.2"
 
 code-point-at@^1.0.0:
@@ -3615,9 +3622,9 @@ doctrine@^2.1.0:
     esutils "^2.0.2"
 
 documentation-website@*:
-  version "1.0.194"
-  resolved "https://registry.yarnpkg.com/documentation-website/-/documentation-website-1.0.194.tgz#b7f813f613e88b120bb36a5e02dbcbf86df44c96"
-  integrity sha512-omuuTffaWVdRbSqaG3E+4VaCvSZ5UocEMdLgkzc76HHnWAGCF9EbeoLAqo574GlWyJkaC1kNGKk83Yi+AzOz1g==
+  version "1.0.196"
+  resolved "https://registry.yarnpkg.com/documentation-website/-/documentation-website-1.0.196.tgz#e1b604133269233943d2742074f7e1eb7aa27cff"
+  integrity sha512-dP67VRBBdlOP7h4KXGaAazKIkUJ5M0ZzzO2vhsMpK8ebKzfDj4bE6WOnUZFKOXq5MqkHr/oQPcS7bmhLvEyylA==
   dependencies:
     boostnode "*"
     bootstrap "^3.3.7"
@@ -3764,9 +3771,9 @@ ejs@*:
   integrity sha512-0xy4A/twfrRCnkhfk8ErDi5DqdAsAqeGxht4xkCUrsvhhbQNs7E+4jV0CN7+NKIY0aHE72+XvqtBIXzD31ZbXQ==
 
 electron-to-chromium@^1.3.86:
-  version "1.3.88"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.88.tgz#f36ab32634f49ef2b0fdc1e82e2d1cc17feb29e7"
-  integrity sha512-UPV4NuQMKeUh1S0OWRvwg0PI8ASHN9kBC8yDTk1ROXLC85W5GnhTRu/MZu3Teqx3JjlQYuckuHYXSUSgtb3J+A==
+  version "1.3.90"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.90.tgz#b4c51b8303beff18f2b74817402bf4898e09558a"
+  integrity sha512-IjJZKRhFbWSOX1w0sdIXgp4CMRguu6UYcTckyFF/Gjtemsu/25eZ+RXwFlV+UWcIueHyQA1UnRJxocTpH5NdGA==
 
 elliptic@^6.0.0:
   version "6.4.1"
@@ -4679,9 +4686,9 @@ flatten@^1.0.2:
   integrity sha1-2uRqnXj74lKSJYzB54CkHZXAN4I=
 
 flow-bin@*:
-  version "0.87.0"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.87.0.tgz#fab7f984d8cc767e93fa9eb01cf7d57ed744f19d"
-  integrity sha512-mnvBXXZkUp4y6A96bR5BHa3q1ioIIN2L10w5osxJqagAakTXFYZwjl0t9cT3y2aCEf1wnK6n91xgYypQS/Dqbw==
+  version "0.88.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.88.0.tgz#e4c7bd93da2331f6ac1733fbe484b1b0c52eb548"
+  integrity sha512-SnUCuhHP0JZaXQ83w4iTthfTInAg8DIBZCo1xIqDhFmQ6XNEMYMwYhPoMQyELRrkbTpyCYmf4g93y0UQw0dibw==
 
 flush-write-stream@^1.0.0:
   version "1.0.3"
@@ -5607,9 +5614,9 @@ internal-ip@^3.0.1:
     ipaddr.js "^1.5.2"
 
 internationalisation@*:
-  version "1.0.155"
-  resolved "https://registry.yarnpkg.com/internationalisation/-/internationalisation-1.0.155.tgz#833d89a39fb07a5474ae8c61155526afd368c5f8"
-  integrity sha512-WoyKrTg5aPpmwxhcQSvnAhf9R4wpuc35WxRXuB+Nn8Kpnp5GTL62raqPEtDpdc+XP4wnZtH2A91oTdDsLgLtOg==
+  version "1.0.157"
+  resolved "https://registry.yarnpkg.com/internationalisation/-/internationalisation-1.0.157.tgz#5029632901629f99b140c2091c1b984531ae7bdc"
+  integrity sha512-vekXpMbghvXyfUlElP4YfeLtB+Y7SimpRnKSXYEnv+gf4GnZNeAYlh1Bcc9w9VSE0l3EReSY0MLVivUZZTarEA==
 
 interpret@^1.0.0, interpret@^1.1.0:
   version "1.1.0"
@@ -7981,9 +7988,9 @@ node-pre-gyp@^0.10.0:
     tar "^4"
 
 node-releases@^1.0.5:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.0.tgz#be7464fa8d877808237520fd49436d5e79191c3d"
-  integrity sha512-+qV91QMDBvARuPxUEfI/mRF/BY+UAkTIn3pvmvM2iOLIRvv6RNYklFXBgrkky6P1wXUqQW1P3qKlWxxy4JZbfg==
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.1.tgz#8fff8aea1cfcad1fb4205f805149054fbf73cafd"
+  integrity sha512-2UXrBr6gvaebo5TNF84C66qyJJ6r0kxBObgZIDX3D3/mt1ADKiHux3NJPWisq0wxvJJdkjECH+9IIKYViKj71Q==
   dependencies:
     semver "^5.3.0"
 
@@ -12395,9 +12402,9 @@ w3c-hr-time@^1.0.1:
     browser-process-hrtime "^0.1.2"
 
 w3c-xmlserializer@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/w3c-xmlserializer/-/w3c-xmlserializer-1.0.0.tgz#d23e20de595b892056f20a359fc2622908d48695"
-  integrity sha512-0et1+9uXYiIRAecx1D5Z1nk60+vimniGdIKl4XjeqkWi6acoHNlXMv1VR5jV+jF4ooeO08oWbYxeAJOcon1oMA==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/w3c-xmlserializer/-/w3c-xmlserializer-1.0.1.tgz#054cdcd359dc5d1f3ec9be4e272c756af4b21d39"
+  integrity sha512-XZGI1OH/OLQr/NaJhhPmzhngwcAnZDLytsvXnRmlYeRkmbb0I7sqFFA22erq4WQR0sUu17ZSQOAV9mFwCqKRNg==
   dependencies:
     domexception "^1.0.1"
     webidl-conversions "^4.0.2"
@@ -12448,9 +12455,9 @@ webidl-conversions@^4.0.2:
   integrity sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==
 
 weboptimizer@*:
-  version "2.0.356"
-  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.356.tgz#3e3da405169599d45ae7b5fa45afcc8dcf98cd2e"
-  integrity sha512-swqFmFAbpsa4wHpLcxPMDbDG87rfVa0eaojVKd1PWNdvfufv+TG0GAV5YzdIqwlw3CzOpcJWNvw41QBIMsEkGQ==
+  version "2.0.358"
+  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.358.tgz#c181dd64ea6545e7ddb7773876ef0f5d7f33a0c5"
+  integrity sha512-Vdi8EBWMbFa4yigOtDQ06S22uaBsxcXUTb1j1RRtZmxjPmwW6FHRgWGStwG+BED6GtQ6acVeKO0j4N3Nn4Oy3A==
   dependencies:
     "@babel/core" "*"
     "@babel/plugin-proposal-class-properties" "*"
@@ -12587,9 +12594,9 @@ webpack@*:
     webpack-sources "^1.3.0"
 
 website-utilities@*:
-  version "1.0.175"
-  resolved "https://registry.yarnpkg.com/website-utilities/-/website-utilities-1.0.175.tgz#9fc144308d47ef8dcb3ece9a2e78542e76d8097d"
-  integrity sha512-KpW4PWvoMD0GMOVlL2F/cFyZ6lXgiHkwcjufKNCFdB996LKP6WTNHI0ToDHSijM5rj8UWCqeZd9n6FZxArMs2w==
+  version "1.0.177"
+  resolved "https://registry.yarnpkg.com/website-utilities/-/website-utilities-1.0.177.tgz#8a4d19529d79694a8f163a654f6102fda04d6542"
+  integrity sha512-X0y2ew9FVeinkS2/DqzesyiMV8R/sKKgtSy9LehN3i7eDXFLusegcEokwYZhGAuuVdDQqXVj+ren+DZA5jNg9g==
   dependencies:
     clientnode "*"
     internationalisation "*"
