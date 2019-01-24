@@ -393,7 +393,7 @@ export class WebsiteBuilder extends $.Tools.class {
         // endregion
         // region initialize editor instances
         this.jsonEditor = new JSONEditor(
-            this.domNodes.jsonEditor, this.constructor.extendObject(
+            this.domNodes.jsonEditor, this.constructor.extend(
                 this._options.jsonEditor, {schema: this._options.schema}))
         this.jsonEditor.setValue(this.scope.parameter)
         this.jsonEditor.on('change', ():void => {
@@ -402,9 +402,8 @@ export class WebsiteBuilder extends $.Tools.class {
             if (errors.length)
                 $.global.alert(errors[0])
             else {
-                this.constructor.extendObject(
-                    true, this.scope.parameter,
-                    this.jsonEditor.getValue())
+                this.constructor.extend(
+                    true, this.scope.parameter, this.jsonEditor.getValue())
                 // Initializes in place editors.
                 this.updateMode()
             }
@@ -469,9 +468,12 @@ export class WebsiteBuilder extends $.Tools.class {
         else if (attributeName.toLowerCase().includes('raw'))
             type = 'raw'
         domNode.addEventListener('click', ():void =>
-            tinymce.init(this.constructor.extendObject(
-                true, {}, this._options.inPlaceEditor.default,
-                this._options.inPlaceEditor[type], {
+            tinymce.init(this.constructor.extend(
+                true,
+                {},
+                this._options.inPlaceEditor.default,
+                this._options.inPlaceEditor[type],
+                {
                     setup: (instance:Object):void => {
                         tuple.push(instance)
                         instance.on('init', ():void => {
@@ -591,9 +593,12 @@ export class WebsiteBuilder extends $.Tools.class {
     renderParameter():void {
         return this.domNode.innerHTML = ejs.render(
             WebsiteBuilder.unescapeHTML(this.template),
-            this.constructor.extendObject(
-                true, {Tools: this.constructor},
-                this._options.defaultParameterScope, this.scope.parameter)
+            this.constructor.extend(
+                true,
+                {Tools: this.constructor},
+                this._options.defaultParameterScope,
+                this.scope.parameter
+            )
         ).trim()
     }
     /**
