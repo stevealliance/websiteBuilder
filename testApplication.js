@@ -5,7 +5,7 @@
 'use strict'
 /* !
     region header
-    [Project page](http://torben.website/websiteBuilder)
+    [Project page](https://torben.website/websiteBuilder)
 
     Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
 
@@ -14,7 +14,7 @@
 
     This library written by torben sickert stand under a creative commons
     naming 3.0 unported license.
-    see http://creativecommons.org/licenses/by/3.0/deed.de
+    Aee https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
 // region imports
