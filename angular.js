@@ -33,7 +33,7 @@ import {
     Input,
     NgModule,
     Optional,
-    Renderer2
+    Renderer2 as Renderer
 } from '@angular/core'
 import {ActivatedRoute, UrlSegment} from '@angular/router'
 // NOTE: Only needed for debugging this file.
@@ -61,12 +61,14 @@ export class EditableDirective {
     elementReference:ElementRef
     initialData:?InitialDataService
     injector:Injector
-    renderer:Renderer2
+    renderer:Renderer
     scope:Object = {}
     constructor(
-        @Optional() activatedRoute:ActivatedRoute, elementReference:ElementRef,
-        @Optional() initialData:InitialDataService, injector:Injector,
-        renderer:Renderer2
+        @Optional() activatedRoute:ActivatedRoute,
+        elementReference:ElementRef,
+        @Optional() initialData:InitialDataService,
+        injector:Injector,
+        renderer:Renderer
     ) {
         this.activatedRoute = activatedRoute
         this.elementReference = elementReference
