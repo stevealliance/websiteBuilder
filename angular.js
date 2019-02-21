@@ -24,7 +24,7 @@ import {
     determineProviders,
     InitialDataService,
     TINY_MCE_DEFAULT_OPTIONS
-} from 'angular-generic'
+} from 'angular-generic/service'
 import {globalContext} from 'clientnode'
 import {
     Directive,
