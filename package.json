@@ -41,7 +41,7 @@
     "build:client": "webOptimizer build",
     "build:typescript": "tsc --project node_modules/angular-generic/aheadOfTimeLibraryCompilation.compiled.json",
     "build:dll": "webOptimizer build:dll",
-    "build:export": "webOptimizer build '{__reference__: \"export\"}'",
+    "build:export": "webOptimizer build '{__reference__: \"target:export\"}'",
     "clear": "webOptimizer clear",
     "document": "webOptimizer document",
     "lint": "webOptimizer check:type; webOptimizer lint",
@@ -130,19 +130,6 @@
     "zone.js": "*"
   },
   "webOptimizer": {
-    "export": {
-      "module": {
-        "preprocessor": {
-          "javaScript": {
-            "options": {
-              "plugins": {
-                "__remove__": "@babel/plugin-transform-runtime"
-              }
-            }
-          }
-        }
-      }
-    },
     "injection": {
       "entry": {
         "angular": {
@@ -250,6 +237,19 @@
       },
       "skipParseRegularExpressions": {
         "__evaluate__": "/(?:^|\\/)(?:(?:@babel\\/polyfill\\/dist\\/polyfill)|(?:webpack\\/buildin\\/global)|(?:webpack\\/buildin\\/module))(?:\\.min)?\\.js(?:\\?.+|$)/"
+      }
+    },
+    "target:export": {
+      "module": {
+        "preprocessor": {
+          "javaScript": {
+            "options": {
+              "plugins": {
+                "__remove__": "@babel/plugin-transform-runtime"
+              }
+            }
+          }
+        }
       }
     }
   }
