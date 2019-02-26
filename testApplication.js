@@ -18,8 +18,9 @@
     endregion
 */
 // region imports
-import GenericModule from 'angular-generic'
-import {InitialDataService} from 'angular-generic/service'
+import {
+    InitialDataService, Module as GenericBaseServiceModule
+} from 'angular-generic/baseService'
 import {Component, enableProdMode, NgModule, VERSION} from '@angular/core'
 import {BrowserModule} from '@angular/platform-browser'
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic'
@@ -68,7 +69,7 @@ export default ():void => {
         imports: [
             BrowserModule,
             EditableModule,
-            GenericModule,
+            GenericBaseServiceModule,
             RouterModule.forRoot(
                 [
                     {

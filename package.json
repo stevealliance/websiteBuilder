@@ -143,6 +143,16 @@
         }
       },
       "external": {
+        "aliases": {
+          "angular-generic/baseService": {
+            "default": "angular-generic/baseService.compiled",
+            "root": "angularGenericBaseService"
+          },
+          "angular-generic/moduleHelper": {
+            "default": "angular-generic/moduleHelper.compiled",
+            "root": "angularGenericModuleHelper"
+          }
+        },
         "implicit": {
           "pattern": {
             "exclude": {

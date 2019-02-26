@@ -22,9 +22,8 @@ import {
     determineDeclarations,
     determineExports,
     determineProviders,
-    InitialDataService,
-    TINY_MCE_DEFAULT_OPTIONS
-} from 'angular-generic/service'
+} from 'angular-generic/moduleHelper'
+import {InitialDataService} from 'angular-generic/baseService'
 import {globalContext} from 'clientnode'
 import {
     Directive,
@@ -36,10 +35,6 @@ import {
     Renderer2 as Renderer
 } from '@angular/core'
 import {ActivatedRoute, UrlSegment} from '@angular/router'
-// NOTE: Only needed for debugging this file.
-try {
-    module.require('source-map-support/register')
-} catch (error) {}
 // endregion
 // region components
 const attributeNames:Array<string> = [
