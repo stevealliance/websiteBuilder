@@ -152,15 +152,6 @@
             "default": "angular-generic/moduleHelper.compiled",
             "root": "angularGenericModuleHelper"
           }
-        },
-        "implicit": {
-          "pattern": {
-            "exclude": {
-              "__append__": {
-                "__evaluate__": "/^clientnode\\/test(?:\\.compiled)?(?:\\.js)?$/"
-              }
-            }
-          }
         }
       }
     },
@@ -171,10 +162,6 @@
       }
     },
     "module": {
-      "aliases": {
-        "#": "Use pre-compiled artefact.",
-        "clientnode/test$": "clientnode/test.compiled"
-      },
       "optimizer": {
         "data": {
           "exclude": "true"
