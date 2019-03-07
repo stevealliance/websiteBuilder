@@ -18,12 +18,10 @@
     endregion
 */
 // region imports
-import {
-    determineDeclarations,
-    determineExports,
-    determineProviders,
-} from 'angular-generic/moduleHelper'
 import {InitialDataService} from 'angular-generic/baseService'
+import {
+    determineDeclarations, determineExports, determineProviders,
+} from 'angular-generic/moduleHelper'
 import {globalContext} from 'clientnode'
 import {
     Directive,
