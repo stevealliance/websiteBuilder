@@ -129,6 +129,7 @@
     "webpack-dev-server": "*",
     "zone.js": "*"
   },
+  "sideEffects": false,
   "webOptimizer": {
     "injection": {
       "entry": {
