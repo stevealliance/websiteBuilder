@@ -2,6 +2,7 @@
 [ignore]
 .*/\.git
 .*/_.*\.js
+.*/angularGeneric/\(\(applicationIndex\)\|\(preRenderDummy\)\)\..*
 .*/.+\.compiled\(\.js\)?
 .*/broken.json
 .*/test([/.]|$)
