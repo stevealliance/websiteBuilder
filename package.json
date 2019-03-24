@@ -70,8 +70,8 @@
     "@angular/router": "*",
     "angular-generic": "*",
     "reflect-metadata": "*",
-    "rxjs": "*",
-    "zone.js": "*"
+    "rxjs": "^6.0.x",
+    "zone.js": "0.8.x"
   },
   "devDependencies": {
     "@angular/animations": "*",
@@ -117,7 +117,7 @@
     "postcss-url": "*",
     "qunit": "*",
     "reflect-metadata": "*",
-    "rxjs": "*",
+    "rxjs": "^6.0.x",
     "style-loader": "*",
     "stylelint": "*",
     "stylelint-config-standard": "*",
@@ -127,7 +127,7 @@
     "webpack": "*",
     "webpack-cli": "*",
     "webpack-dev-server": "*",
-    "zone.js": "*"
+    "zone.js": "0.8.x"
   },
   "sideEffects": false,
   "webOptimizer": {
